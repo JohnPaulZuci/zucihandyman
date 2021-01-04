@@ -51,7 +51,10 @@ object CommandFactory {
       case "writecsv" => new WriteCsvAndTsvAction
       case "nlptextpreprocessing" => new NLPTextPreprocessingAction
       case "dropboxcleanup" => new DropboxCleanupAction
-
+      case "rest" => new RestAction
+      case "soap" => new SoapAction
+      case "jsontransformation" => new JsonTranformationAction
+      
     }
   }
 }

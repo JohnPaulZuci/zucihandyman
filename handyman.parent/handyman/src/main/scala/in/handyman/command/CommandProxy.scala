@@ -9,6 +9,7 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList
 import com.typesafe.scalalogging.LazyLogging
 import in.handyman.dsl.Expression
 import in.handyman.dsl.impl.ExpressionImpl
+import in.handyman.dsl.MultiPartData
 
 object CommandProxy extends LazyLogging {
   //val eList = classOf[EList[String]].getName
@@ -26,6 +27,11 @@ object CommandProxy extends LazyLogging {
                 logger.info("Invoking method in  action #{}", method.getName)
                 method.invoke(proxee, args: _*)
                   .asInstanceOf[EObjectContainmentEList[RestPart]]
+              }
+              case "getMultiParts" => {
+                logger.info("Invoking method in  action #{}", method.getName)
+                method.invoke(proxee, args: _*)
+                  .asInstanceOf[EObjectContainmentEList[MultiPartData]]
               }
               case _ => {
                 val interim = method.invoke(proxee, args: _*)
@@ -48,7 +54,7 @@ object CommandProxy extends LazyLogging {
                 val interim = method.invoke(proxee, args: _*)
                   .asInstanceOf[Expression]
                 logger.info("Invoking method in  action #{}", method.getName)
-                if (interim!=null && interim.getLhs != null && interim.getRhs != null) {
+                if (interim != null && interim.getLhs != null && interim.getRhs != null) {
                   interim.setLhs(ParameterisationEngine.resolve(interim.getLhs, context))
                   interim.setRhs(ParameterisationEngine.resolve(interim.getRhs, context))
                 }

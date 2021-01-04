@@ -11,13 +11,13 @@ Process:
 	'}';
 
 Try:
-	'try' 
+	'try'
 	'{'
 	(action+=Action)*
 	'}';
 
 Finally:
-	'finally' 
+	'finally'
 	'{'
 	(action+=Action)*
 	'}';
@@ -67,7 +67,9 @@ Action:
 	| Mahout
 	| Terminal
 	| NLPTextPreprocessing
-	| DropboxCleanup);
+	| DropboxCleanup
+	| Soap
+	| JSONTransformation);
 
 DeleteFolder:
 	'deletefolder' 'as' name=STRING 'folder' foldersource=STRING 'zipfile' zipsource=STRING
@@ -244,6 +246,7 @@ Doozle:
 
 Rest:
 	'rest' 'as' name=STRING 'secured-by' authtoken=STRING 'with-url' url=STRING 'and-method-as' method=STRING
+	'with-authentication-type' authenticationType=STRING
 	'{'
 	'from' resourcedatafrom=STRING 'update-url-with' '{'
 	urldata=SelectStatement
@@ -260,8 +263,41 @@ Rest:
 	'}'
 	'}' 'on-condition' condition=Expression;
 
+Soap:
+	'soap' 'as' name=STRING 'with-url' url=STRING 'and-method-as' method=STRING
+	'content-type' contentType=STRING 'api-call-type' apiCallType=STRING
+	'source' db=STRING 'for-auth-values' '{'
+	sourceValue=SelectStatement
+	'}'
+	'select-distinct-company' '{'
+	selectDistinctCompany=SelectStatement
+	'}'
+	'store-data-for-transform' '{'
+	storeDataForTransform=SelectStatement
+	'}'
+	'update-page-max-based-on-company-code' '{'
+	updatePageMaxValue=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+JSONTransformation:
+	'jsontransformation' 'as' name=STRING 'source' db=STRING 'target-table-name' targetTableName=STRING
+	'api-call-type' apiCallType=STRING 'key-value-input-for-json-iteration' '{'
+	jsonKeyValue=SelectStatement
+	'}'
+	'input-for-insert-from-temp-table' '{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
 RestPart:
-	'part' 'as' partName=STRING 'with' partData=SelectStatement;
+	'part' 'as' partName=STRING 'with'
+	partData=SelectStatement
+	multiParts+=(MultiPartData)*;
+
+PartData:
+	'partsingleobject' 'as' partName=STRING onPath=STRING 'with' partData=SelectStatement;
+
+MultiPartData:
+	'partmultiobject' 'as' partName=STRING onPath=STRING 'with' partData=SelectStatement;
 
 TrelloGET:
 	'trelloget' 'as' name=STRING 'secured-by' authtoken=STRING 'with-key' key=STRING 'through-user' useraccount=STRING
