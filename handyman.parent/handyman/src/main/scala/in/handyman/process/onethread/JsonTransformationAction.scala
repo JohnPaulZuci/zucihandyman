@@ -70,6 +70,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
   def execute(context: Context, action: Action, actionId: Integer): Context = {
     val jsonTransformAsIs = action.asInstanceOf[in.handyman.dsl.JSONTransformation]
     val jsonTransform: in.handyman.dsl.JSONTransformation = CommandProxy.createProxy(jsonTransformAsIs, classOf[in.handyman.dsl.JSONTransformation], context)
+    val processId = context.getValue("process-id")
 
     //source DB
     val sourceDB = jsonTransform.getDb
@@ -237,7 +238,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
               val childJSONValue: AnyRef = childJSONArrayObj.get(i)
               if (childJSONValue.isInstanceOf[JSONObject]) {
                 mapObjFromJSONToInsert = new HashMap()
-                val childArrayObject: JSONObject =new JSONObject(childJSONValue.toString)
+                val childArrayObject: JSONObject = new JSONObject(childJSONValue.toString)
                 iterateJSONObjectForCompany(resultColumnNames, childArrayObject, mapList)
               }
             }
@@ -266,7 +267,11 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
               iterateJSONObjectForCompany(resultColumnNames, childArrayObject, mapList)
             }
           })
-        if (!mapObjFromJSONToInsert.isEmpty) mapList.add(mapObjFromJSONToInsert)
+        if (!mapObjFromJSONToInsert.isEmpty) {
+          if (resultColumnNames.contains("process_id"))
+            mapObjFromJSONToInsert.put("process_id", processId)
+          mapList.add(mapObjFromJSONToInsert)
+        }
       } catch {
         case e: Exception => e.printStackTrace()
 
@@ -282,17 +287,16 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
             if (childObject.get(childJSON).isInstanceOf[JSONObject]) {
               val childArrayObject: JSONObject =
                 new JSONObject(childObject.get(childJSON).toString())
-              iterateJSONObject(
-                resultColumnNames,
-                childArrayObject,
-                mapList,
-                companyCodeValue)
+              iterateJSONObject(resultColumnNames, childArrayObject, mapList, companyCodeValue)
             }
           })
-        if (!mapObjFromJSONToInsert.isEmpty)
+        if (!mapObjFromJSONToInsert.isEmpty) {
           if (resultColumnNames.contains("CompanyCode"))
             mapObjFromJSONToInsert.put("CompanyCode", companyCodeValue)
-        mapList.add(mapObjFromJSONToInsert)
+          if (resultColumnNames.contains("process_id"))
+            mapObjFromJSONToInsert.put("process_id", processId)
+          mapList.add(mapObjFromJSONToInsert)
+        }
       } catch {
         case e: Exception => e.printStackTrace()
 
@@ -308,7 +312,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
         val resultColumnNames: List[String] = new ArrayList[String]()
         var i: Int = 1
         while (i <= rs.getMetaData.getColumnCount) {
-          resultColumnNames.add(rs.getMetaData.getColumnName(i))
+          resultColumnNames.add(rs.getMetaData.getColumnLabel(i))
           i += 1;
         }
         rs.close()

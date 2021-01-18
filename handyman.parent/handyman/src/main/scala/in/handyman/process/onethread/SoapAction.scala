@@ -63,11 +63,12 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
 
   var mapObjFromJSONToInsert: HashMap[String, Any] = null
   var companyDistinctList: List[String] = new ArrayList()
-
+  var templateName: String = null
   def execute(context: Context, action: Action, actionId: Integer): Context = {
     val soapAsIs = action.asInstanceOf[in.handyman.dsl.Soap]
     val soap: in.handyman.dsl.Soap = CommandProxy.createProxy(soapAsIs, classOf[in.handyman.dsl.Soap], context)
 
+    val processId = context.getValue("process-id")
     //source DB
     val sourceDB = soap.getDb
 
@@ -111,12 +112,16 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
           val response: String = postCall(finalInputXML, CONTENT_TYPE, API_CALL_METHOD)
           val readTree: JsonNode = xmlMapper.readTree(response)
           val dataNodeResult: JsonNode = getDataFromResultNode(readTree)
+          templateName = dataNodeResult.get("Template").toString()
+          System.out.println(dataNodeResult.get(templateName))
+          System.out.println(dataNodeResult.get("ADM_CompanyProfile_tbl"))
+          val datanodeArray = new JSONArray(dataNodeResult.get("ADM_CompanyProfile_tbl").toString())
+          System.out.println("lenght of the data node  " + datanodeArray.length());
           val errorsResultNode: JsonNode = dataNodeResult
-          val errorsFoundList: List[String] =
-            getErrorStatusFromJonas(dataNodeResult, errorsResultNode)
-          val finalErrorsList: List[String] =
-            errorsFoundList.stream().distinct().collect(Collectors.toList())
-          updateAuditTableForAllApiCallsForCompany(finalInputXML, String.valueOf(dataNodeResult), String.valueOf(finalErrorsList), JONAS_AUDIT_TABLE_INSERT)
+          val totalErrorsFound = getTotalErrorsFoundValueFromErrorNode(errorsResultNode)
+          val errorsFoundList: List[String] = getErrorStatusFromJonas(dataNodeResult, errorsResultNode)
+          val finalErrorsList: List[String] = errorsFoundList.stream().distinct().collect(Collectors.toList())
+          updateAuditTableForAllApiCallsForCompany(finalInputXML, String.valueOf(dataNodeResult), String.valueOf(finalErrorsList), datanodeArray.length(), totalErrorsFound, JONAS_AUDIT_TABLE_INSERT)
         } else if (apiType.toLowerCase() == "employee" || apiType.toLowerCase() == "jobmaster") {
           getDistinctCompanyFromCompanyTransform()
           soapAPIExecution(finalXML, companyDistinctList, apiType)
@@ -152,7 +157,12 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
             val response: String = postCall(finalInputXML, CONTENT_TYPE, API_CALL_METHOD)
             val readTree: JsonNode = xmlMapper.readTree(response)
             val dataNodeResult: JsonNode = getDataFromResultNode(readTree)
+            System.out.println(dataNodeResult.get(templateName))
+            System.out.println(dataNodeResult.get(templateName))
+            val datanodeArray = new JSONArray(dataNodeResult.get(templateName).toString())
+            System.out.println("lenght of the data node  " + datanodeArray.length());
             val errorsResultNode: JsonNode = dataNodeResult
+            val totalErrorsFound = getTotalErrorsFoundValueFromErrorNode(errorsResultNode)
             if (firstTimeIteration == true) {
               val pageMaxResultNode = getPageMaxValueFromResultNode(dataNodeResult)
               firstTimeIteration = false
@@ -178,7 +188,7 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
             val finalErrorsList: List[String] =
               errorsFoundList.stream().distinct().collect(Collectors.toList())
             if (apiTypeVal.toLowerCase() == "employee" || apiTypeVal.toLowerCase() == "jobmaster") {
-              updateAuditTableForAllApiCalls(finalInputXML, String.valueOf(dataNodeResult), String.valueOf(finalErrorsList), JONAS_AUDIT_TABLE_INSERT, companyCodeValue, pageNum)
+              updateAuditTableForAllApiCalls(finalInputXML, String.valueOf(dataNodeResult), String.valueOf(finalErrorsList), datanodeArray.length(), totalErrorsFound, JONAS_AUDIT_TABLE_INSERT, companyCodeValue, pageNum)
             }
           } while (pageMax < pageMaxValue);
         } catch {
@@ -202,6 +212,9 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
                 if (entry.equalsIgnoreCase("PageNum")) {
                   println("Previous value " + objectJSON.get("PageNum") + " and current value is  =>" + sum)
                   objectJSON.put("PageNum", sum)
+                }
+                if (entry.equalsIgnoreCase("Template")) {
+                  templateName = objectJSON.get("Template").toString()
                 }
                 if (entry.equalsIgnoreCase("CompanyCode")) {
                   println(companyCodeValue)
@@ -232,8 +245,8 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
         val url: URL = new URL(API_URL)
         val conn: HttpURLConnection =
           url.openConnection().asInstanceOf[HttpURLConnection]
-        conn.setReadTimeout(30000)
-        conn.setConnectTimeout(30000)
+        //        conn.setReadTimeout(30000)
+        //        conn.setConnectTimeout(30000)
         conn.setRequestMethod(requestMethod)
         conn.setDoInput(true)
         conn.setDoOutput(true)
@@ -424,9 +437,7 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
       val errorsFoundList: List[String] = new ArrayList[String]()
       errorsResultNode.fieldNames().forEachRemaining((entry) =>
         if (entry.equalsIgnoreCase("errorsFound")) {
-          if (java.lang.Integer.valueOf(
-            errorsResultNode.get("errorsFound").toString) >
-            0) {
+          if (java.lang.Integer.valueOf(errorsResultNode.get("errorsFound").toString) > 0) {
             val value: AnyRef = dataNodeResult.get("errors").toString
             val errorChildObject: JSONArray = new JSONArray(value.toString)
             errorChildObject.forEach((errorVal) =>
@@ -436,14 +447,17 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
       errorsFoundList
     }
 
-    def updateAuditTableForAllApiCallsForCompany(finalInputXML: String, response: String, errors: String,
+    def updateAuditTableForAllApiCallsForCompany(finalInputXML: String, response: String, errors: String, totalRecordsProcessed: Int, totalErrosFound: Int,
       insertStmt: String): Unit = {
       var connection: Connection = ResourceAccess.rdbmsConn(sourceDB)
       var statement: Statement = connection.createStatement()
       var preparedStatement: PreparedStatement = connection.prepareStatement(String.valueOf(insertStmt.replaceAll("\"", "")))
-      preparedStatement.setString(1, finalInputXML)
-      preparedStatement.setString(2, response)
-      preparedStatement.setString(3, errors)
+      preparedStatement.setObject(1, processId)
+      preparedStatement.setString(2, finalInputXML)
+      preparedStatement.setString(3, response)
+      preparedStatement.setString(4, errors)
+      preparedStatement.setObject(5, totalRecordsProcessed)
+      preparedStatement.setObject(6, totalErrosFound)
       preparedStatement.executeUpdate()
       preparedStatement.closeOnCompletion()
       connection.commit()
@@ -452,15 +466,18 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
     }
 
     def updateAuditTableForAllApiCalls(finalInputXML: String, response: String, errors: String,
-      insertStmt: String, companyCode: String, pageNum: Int): Unit = {
+      totalRecordsProcessed: Int, totalErrorsFound: Int, insertStmt: String, companyCode: String, pageNum: Int): Unit = {
       var connection: Connection = ResourceAccess.rdbmsConn(sourceDB)
       var statement: Statement = connection.createStatement()
       var preparedStatement: PreparedStatement = connection.prepareStatement(String.valueOf(insertStmt.replaceAll("\"", "")))
-      preparedStatement.setString(1, companyCode)
-      preparedStatement.setInt(2, pageNum)
-      preparedStatement.setString(3, finalInputXML)
-      preparedStatement.setString(4, response)
-      preparedStatement.setString(5, errors)
+      preparedStatement.setObject(1, processId)
+      preparedStatement.setString(2, companyCode)
+      preparedStatement.setInt(3, pageNum)
+      preparedStatement.setString(4, finalInputXML)
+      preparedStatement.setString(5, response)
+      preparedStatement.setString(6, errors)
+      preparedStatement.setObject(7, totalRecordsProcessed)
+      preparedStatement.setObject(8, totalErrorsFound)
       preparedStatement.executeUpdate()
       preparedStatement.closeOnCompletion()
       connection.commit()
@@ -473,6 +490,19 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
       try {
         java.util.Optional
           .ofNullable(readTreeValue.get("PageMax").asInt()).orElse(readTreeValue.asInt(0))
+      } catch {
+        case e: Exception => {
+          e.printStackTrace()
+          return 0
+        }
+      }
+    }
+
+    def getTotalErrorsFoundValueFromErrorNode(readTreeValue: JsonNode): Int = {
+      try {
+        val error = readTreeValue.get("errorsFound")
+        java.util.Optional
+          .ofNullable(readTreeValue.get("errorsFound").asInt()).orElse(readTreeValue.asInt(0))
       } catch {
         case e: Exception => {
           e.printStackTrace()
