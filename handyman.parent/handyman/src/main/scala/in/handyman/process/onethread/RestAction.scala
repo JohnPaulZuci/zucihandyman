@@ -145,7 +145,7 @@ class RestAction extends in.handyman.command.Action with LazyLogging {
             val childPartAsIs: in.handyman.dsl.MultiPartData = childPartSrc.asInstanceOf[in.handyman.dsl.MultiPartData]
             val childPart: in.handyman.dsl.MultiPartData = CommandProxy.createProxy(childPartAsIs, classOf[in.handyman.dsl.MultiPartData], context)
             val childPartName = childPart.getPartName
-            val childQuery = childPart.getMultiPartData
+            val childQuery = childPart.getPartData
             val childBodyStmt = bodayConn.createStatement
             val childPartRs = childBodyStmt.executeQuery(childQuery.replaceAll("\"", ""))
             val childPartColCount = childPartRs.getMetaData.getColumnCount
