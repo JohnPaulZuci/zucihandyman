@@ -247,8 +247,6 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
               mapObjFromJSONToInsert.put(jsonKeyVal, dataNodeResult.get(jsonKeyVal))
             }
           }
-          if (!mapObjFromJSONToInsert.isEmpty)
-            mapList.add(mapObjFromJSONToInsert)
         })
       } catch {
         case e: Exception => e.printStackTrace()
