@@ -124,7 +124,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
           })
         if (!mapList.isEmpty) {
           mapList.stream().forEach((mapEntry) =>
-            createAndExecuteinsertStmtFromMap(INSERT_TABLE_NAME, mapEntry.asInstanceOf[java.util.HashMap[Any, Any]],connection))
+            createAndExecuteinsertStmtFromMap(INSERT_TABLE_NAME, mapEntry.asInstanceOf[java.util.HashMap[Any, Any]]))
         }
       } catch {
         case e: Exception => e.printStackTrace()
@@ -137,8 +137,8 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
       }
     }
 
-    def createAndExecuteinsertStmtFromMap(tableName: String, dataMap: HashMap[Any, Any],connection:Connection): Unit = {
-      //var connection: Connection = ResourceAccess.rdbmsConn(sourceDB)
+    def createAndExecuteinsertStmtFromMap(tableName: String, dataMap: HashMap[Any, Any]): Unit = {
+      var connection: Connection = ResourceAccess.rdbmsConn(sourceDB)
       try {
         val sql: StringBuilder =
           new StringBuilder("INSERT INTO ").append(tableName).append(" (")
@@ -168,7 +168,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
       } finally {
         if (Objects.nonNull(connection)) {
           connection.commit()
-          //connection.close()
+          connection.close()
         }
       }
     }
@@ -348,8 +348,6 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
             }
           }
         }
-        if (!mapObjFromJSONToInsert.isEmpty)
-          mapList.add(mapObjFromJSONToInsert)
       })
     }
 
