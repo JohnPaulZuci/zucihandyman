@@ -69,7 +69,8 @@ Action:
 	| NLPTextPreprocessing
 	| DropboxCleanup
 	| Soap
-	| JSONTransformation);
+	| JSONTransformation
+	| SendEMail);
 
 DeleteFolder:
 	'deletefolder' 'as' name=STRING 'folder' foldersource=STRING 'zipfile' zipsource=STRING
@@ -85,6 +86,13 @@ DropboxCleanup:
 
 Mail:
 	'mail' 'as' name=STRING 'db' source=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+SendEMail:
+	'sendemail' 'as' name=STRING 'db' source=STRING 'from' from=STRING 'pass' pass=STRING 'to' to=STRING 'cc' cc=STRING
+	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;

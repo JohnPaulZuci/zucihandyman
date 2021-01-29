@@ -54,7 +54,8 @@ object CommandFactory {
       case "rest" => new RestAction
       case "soap" => new SoapAction
       case "jsontransformation" => new JsonTranformationAction
-      
+      case "sendemail" => new SendEMailAction
+
     }
   }
 }
