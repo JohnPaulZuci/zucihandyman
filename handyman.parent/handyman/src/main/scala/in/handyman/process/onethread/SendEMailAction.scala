@@ -23,6 +23,9 @@ import in.handyman.util.ResourceAccess
 import java.sql.Statement
 import java.util.ArrayList
 import java.text.SimpleDateFormat
+import in.handyman.audit.AuditService
+import java.sql.SQLSyntaxErrorException
+import in.handyman.util.ExceptionUtil
 
 class SendEMailAction extends in.handyman.command.Action with LazyLogging {
 
@@ -38,6 +41,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     val from = mail.getFrom
     val name = mail.getName
     val sql: String = mail.getValue.replaceAll("\"", "")
+    val sqlList = sql.split(";")
     val id = context.getValue("process-id")
     val pass = mail.getPass
     val formatter: SimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -54,31 +58,58 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     val con = ResourceAccess.rdbmsConn(source)
     st = con.createStatement()
     con.setAutoCommit(false)
-    var text =
-      "<br><table width='100%' border='1' align='center'> <tr align='center'>"
-    val rs = st.executeQuery(sql)
-    val col: Int = rs.getMetaData.getColumnCount
-    val colData = new ArrayList[String]()
-    var i: Int = 1
-    while (i <= col) {
-      text = text + "<td><b>" + rs.getMetaData.getColumnLabel(i) + "<b></td>"
-      colData.add(rs.getMetaData.getColumnLabel(i))
-      i = i + 1
+    var text: String = null
+    sqlList.foreach { sql =>
+      if (!sql.trim.isEmpty()) {
+        logger.info(aMarker, "Transform id#{}, executing script {}", id, sql.trim)
+        val statementId = AuditService.insertStatementAudit(actionId, "transform->" + name, context.getValue("process-name"))
+        try {
+          text = "<br><table border='1' align='center'> <tr align='center'>"
+          val rs = st.executeQuery(sql)
+          val col: Int = rs.getMetaData.getColumnCount
+          val colData = new ArrayList[String]()
+          var i: Int = 1
+          while (i <= col) {
+            text = text + "<td><b>" + rs.getMetaData.getColumnLabel(i) + "<b><b>"
+            colData.add(rs.getMetaData.getColumnLabel(i))
+            i = i + 1
+          }
+          text = text + " </tr>"
+          while (rs.next) {
+            text = text + "<tr align='center'>"
+            colData.stream().forEach(entry => {
+              text = text + "<td>" + rs.getObject(entry) + "</td>";
+            })
+            text = text + "</tr>"
+          }
+          rs.last()
+          if ((!rs.isBeforeFirst() && rs.getRow() == 0)) {
+            text = text + "<td>" + "NO RECORDS PROCESSED" + "</td>";
+            text = text + "</tr>"
+          }
+          text = text + "</table><br>"
+          logger.info(aMarker, "Transform id# {}, executed script {} rows returned {}", statementId.toString(), sql.trim())
+          st.clearWarnings();
+        } catch {
+          case ex: SQLSyntaxErrorException => {
+            logger.error(aMarker, "Stopping execution, General Error executing sql for {} with for campaign {}", sql, ex)
+            detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
+            throw ex
+          }
+          case ex: SQLException => {
+            logger.error(aMarker, "Continuing to execute, even though SQL Error executing sql for {} ", sql, ex)
+            detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
+          }
+          case ex: Throwable => {
+            logger.error(aMarker, "Stopping execution, General Error iexecuting sql for {} with for campaign {}", sql, ex)
+            detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
+            throw ex
+          }
+        }
+      }
     }
-    text = text + " </tr>"
 
-    while (rs.next) {
-      text = text + "<tr align='center'>"
-      colData.stream().forEach(entry => {
-        text = text + "<td>" + rs.getObject(entry) + "</td>";
-      })
-      text = text + "</tr>"
-    }
-    if ((!rs.isBeforeFirst() && rs.getRow() == 0)) {
-      text = text + "<td>" + "NO RECORDS PROCESSED" + "</td>";
-      text = text + "</tr>"
-    }
-    text = text + "</table><br><br><br>Thanks,<br>INTEGRATION TEAM.<br><br>"
+    text = text + "<br><br>Thanks,<br>INTEGRATION TEAM.<br><br>"
     content = content.concat(text)
     try {
       var message: Message = null
