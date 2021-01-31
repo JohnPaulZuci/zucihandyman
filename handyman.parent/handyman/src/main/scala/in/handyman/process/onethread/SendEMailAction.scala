@@ -49,47 +49,60 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     System.out.println(formatter.format(date));
     var subject = mail.getSubject
     subject = subject.concat(" " + formatter.format(date))
-    var content = "Hi Team! ,<br><br>"
-    content = content.concat("<br>Please find the result of the pipeline below:<br>")
-    //    content = content+"\r\nPlease find the result of the pipeline below:\r\n"
+    var content = mail.getBody
+    //    content = content.concat("<br>Please find the result of the pipeline below:<br>")
     val to = mail.getTo
     val cc = mail.getCc
     val bcc = mail.getBcc
+    val signature = mail.getSignature
     val con = ResourceAccess.rdbmsConn(source)
     st = con.createStatement()
     con.setAutoCommit(false)
-    var text: String = null
+    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width: 100%;max-width: 100%;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:#98dcff;}</style></head><body>"
     sqlList.foreach { sql =>
       if (!sql.trim.isEmpty()) {
         logger.info(aMarker, "Transform id#{}, executing script {}", id, sql.trim)
         val statementId = AuditService.insertStatementAudit(actionId, "transform->" + name, context.getValue("process-name"))
         try {
-          text = "<br><table border='1' align='center'> <tr align='center'>"
           val rs = st.executeQuery(sql)
           val col: Int = rs.getMetaData.getColumnCount
           val colData = new ArrayList[String]()
-          var i: Int = 1
-          while (i <= col) {
-            text = text + "<td><b>" + rs.getMetaData.getColumnLabel(i) + "<b><b>"
-            colData.add(rs.getMetaData.getColumnLabel(i))
-            i = i + 1
+          if ((!rs.next())) {
+            text = text + "<h5 class='heading'>" + "NO RECORDS PROCESSED TODAY" + "</h5>";
+          } else {
+            text = text + "<br><table border='1' align='center' class='table-view'> <thead class='thead-view'> <tr align='center'>"
+            var i: Int = 1
+            while (i <= col) {
+              text = text + "<td><b>" + rs.getMetaData.getColumnLabel(i) + "<b></td>"
+              colData.add(rs.getMetaData.getColumnLabel(i))
+              i = i + 1
+            }
+            text = text + " </tr></thead><tbody>"
+            var colorCount: Int = 1;
+            do {
+              if (colorCount % 2 == 0) {
+                text = text + "<tr class='back-view'>"
+              } else {
+                text = text + "<tr>"
+              }
+              colorCount = colorCount + 1
+
+              colData.stream().forEach(entry => {
+                var value = rs.getObject(entry).toString()
+                if (value.contains(".")) {
+                  value = value.substring(0, value.indexOf("."));
+                }
+                println(value)
+                text = text + "<td>" + value + "</td>";
+              })
+              text = text + "</tr>"
+            } while (rs.next());
+            text = text + "</tbody></table><br>"
           }
-          text = text + " </tr>"
-          while (rs.next) {
-            text = text + "<tr align='center'>"
-            colData.stream().forEach(entry => {
-              text = text + "<td>" + rs.getObject(entry) + "</td>";
-            })
-            text = text + "</tr>"
-          }
-          rs.last()
-          if ((!rs.isBeforeFirst() && rs.getRow() == 0)) {
-            text = text + "<td>" + "NO RECORDS PROCESSED" + "</td>";
-            text = text + "</tr>"
-          }
-          text = text + "</table><br>"
+
           logger.info(aMarker, "Transform id# {}, executed script {} rows returned {}", statementId.toString(), sql.trim())
           st.clearWarnings();
+          rs.close()
         } catch {
           case ex: SQLSyntaxErrorException => {
             logger.error(aMarker, "Stopping execution, General Error executing sql for {} with for campaign {}", sql, ex)
@@ -108,8 +121,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
         }
       }
     }
-
-    text = text + "<br><br>Thanks,<br>INTEGRATION TEAM.<br><br>"
+    text = text + "<br><br>Thanks,<br>" + signature + ".<br><br></body></html>"
     content = content.concat(text)
     try {
       var message: Message = null

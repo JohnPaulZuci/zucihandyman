@@ -92,7 +92,7 @@ Mail:
 
 SendEMail:
 	'sendemail' 'as' name=STRING 'db' source=STRING 'from' from=STRING 'pass' pass=STRING 'to' to=STRING 'cc' cc=STRING
-	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'using'
+	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'signature' signature=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
