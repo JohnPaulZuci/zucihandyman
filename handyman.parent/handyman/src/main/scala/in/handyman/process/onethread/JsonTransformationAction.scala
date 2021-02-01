@@ -200,7 +200,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
       val json: JSONArray = new JSONArray()
       try {
         val rsmd: ResultSetMetaData = rs.getMetaData
-        do {
+        while (rs.next()) {
           val numColumns: Int = rsmd.getColumnCount
           val obj: JSONObject = new JSONObject()
           var i: Int = 1
@@ -210,7 +210,7 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
             i += 1;
           }
           json.put(obj)
-        } while (rs.next());
+        }
       } catch {
         case e: SQLException => e.printStackTrace()
 
