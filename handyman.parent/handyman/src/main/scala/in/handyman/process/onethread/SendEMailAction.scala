@@ -44,7 +44,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     val sqlList = sql.split(";")
     val id = context.getValue("process-id")
     val pass = mail.getPass
-    val formatter: SimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    val formatter: SimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
     val date: Date = new Date();
     System.out.println(formatter.format(date));
     var subject = mail.getSubject
@@ -58,7 +58,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     val con = ResourceAccess.rdbmsConn(source)
     st = con.createStatement()
     con.setAutoCommit(false)
-    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width: 100%;max-width: 100%;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:#98dcff;}</style></head><body>"
+    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width: max-content;max-width:max-content;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:#98dcff;}</style></head><body>"
     sqlList.foreach { sql =>
       if (!sql.trim.isEmpty()) {
         logger.info(aMarker, "Transform id#{}, executing script {}", id, sql.trim)
