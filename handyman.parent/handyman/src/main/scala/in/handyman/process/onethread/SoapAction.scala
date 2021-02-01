@@ -113,10 +113,10 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
           val readTree: JsonNode = xmlMapper.readTree(response)
           val dataNodeResult: JsonNode = getDataFromResultNode(readTree)
           templateName = dataNodeResult.get("Template").toString()
-          System.out.println(dataNodeResult.get(templateName))
-          System.out.println(dataNodeResult.get("ADM_CompanyProfile_tbl"))
+          logger.debug(String.valueOf(dataNodeResult.get(templateName)))
+          logger.debug(String.valueOf(dataNodeResult.get("ADM_CompanyProfile_tbl")))
           val datanodeArray = new JSONArray(dataNodeResult.get("ADM_CompanyProfile_tbl").toString())
-          System.out.println("lenght of the data node  " + datanodeArray.length());
+          logger.debug("lenght of the data node  " + datanodeArray.length());
           val errorsResultNode: JsonNode = dataNodeResult
           val totalErrorsFound = getTotalErrorsFoundValueFromErrorNode(errorsResultNode)
           val errorsFoundList: List[String] = getErrorStatusFromJonas(dataNodeResult, errorsResultNode)
@@ -125,7 +125,7 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
         } else if (apiType.toLowerCase() == "employee" || apiType.toLowerCase() == "jobmaster") {
           getDistinctCompanyFromCompanyTransform()
           soapAPIExecution(finalXML, companyDistinctList, apiType)
-          System.out.println("total executed count    ======>>>>>> " + totalAPICallCount)
+          logger.debug("total executed count    ======>>>>>> " + totalAPICallCount)
         }
       } catch {
         case e: Exception => e.printStackTrace()
@@ -157,10 +157,10 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
             val response: String = postCall(finalInputXML, CONTENT_TYPE, API_CALL_METHOD)
             val readTree: JsonNode = xmlMapper.readTree(response)
             val dataNodeResult: JsonNode = getDataFromResultNode(readTree)
-            System.out.println(dataNodeResult.get(templateName))
-            System.out.println(dataNodeResult.get(templateName))
+            logger.debug(String.valueOf((dataNodeResult.get(templateName))))
+            logger.debug(String.valueOf((dataNodeResult.get(templateName))))
             val datanodeArray = new JSONArray(dataNodeResult.get(templateName).toString())
-            System.out.println("lenght of the data node  " + datanodeArray.length());
+            logger.debug("lenght of the data node  " + datanodeArray.length());
             val errorsResultNode: JsonNode = dataNodeResult
             val totalErrorsFound = getTotalErrorsFoundValueFromErrorNode(errorsResultNode)
             if (firstTimeIteration == true) {
@@ -168,7 +168,7 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
               firstTimeIteration = false
               if (pageMax == 0 && Objects.nonNull(pageMaxResultNode)) {
                 pageMaxValue = java.lang.Integer.valueOf(pageMaxResultNode.toString)
-                println("page max value   == >" + pageMaxValue)
+                logger.debug("page max value   == >" + pageMaxValue)
                 if (apiTypeVal.toLowerCase() == "employee" || apiTypeVal.toLowerCase() == "jobmaster") {
                   preparedStatement = connection.prepareStatement(
                     String.valueOf(JONAS_UPDATE_COMPANY_PAGEMAX.replaceAll("\"", "")))
@@ -210,14 +210,14 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
               val objectJSON: JSONObject = new JSONObject(currentAPIParamsValue)
               objectJSON.keySet.forEach((entry) => {
                 if (entry.equalsIgnoreCase("PageNum")) {
-                  println("Previous value " + objectJSON.get("PageNum") + " and current value is  =>" + sum)
+                  logger.debug("Previous value " + objectJSON.get("PageNum") + " and current value is  =>" + sum)
                   objectJSON.put("PageNum", sum)
                 }
                 if (entry.equalsIgnoreCase("Template")) {
                   templateName = objectJSON.get("Template").toString()
                 }
                 if (entry.equalsIgnoreCase("CompanyCode")) {
-                  println(companyCodeValue)
+                  logger.debug(companyCodeValue)
                   objectJSON.put("CompanyCode", companyCodeValue)
                 }
               })
@@ -551,7 +551,7 @@ class SoapAction extends in.handyman.command.Action with LazyLogging {
         try {
           val rootNode2: JsonNode = mapper.readTree(rootNode.asText());
           if (rootNode2.get("data") != null) {
-            print(mapper.readTree(rootNode2.get("data").asText().replaceAll("\\.(?!\\d)", "")))
+            logger.debug(String.valueOf((mapper.readTree(rootNode2.get("data").asText().replaceAll("\\.(?!\\d)", "")))))
             val result: JsonNode = mapper.readTree(rootNode2.get("data").asText().replaceAll("\\.(?!\\d)", ""));
             return result
           }

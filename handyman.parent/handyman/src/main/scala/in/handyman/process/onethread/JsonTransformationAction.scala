@@ -152,14 +152,13 @@ class JsonTranformationAction extends in.handyman.command.Action with LazyLoggin
           }
         }
         sql.append(") VALUES (").append(placeholders).append(");")
-        print(sql)
+        logger.debug(String.valueOf((sql)))
         var preparedStatement: PreparedStatement = connection.prepareStatement(String.valueOf(sql))
         var i: Int = 1
         for (value <- dataMap.values) {
           preparedStatement.setObject(i, value)
           i += 1
         }
-        print(preparedStatement)
         preparedStatement.execute()
         preparedStatement.closeOnCompletion()
       } catch {

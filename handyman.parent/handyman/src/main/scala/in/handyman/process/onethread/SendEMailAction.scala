@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat
 import in.handyman.audit.AuditService
 import java.sql.SQLSyntaxErrorException
 import in.handyman.util.ExceptionUtil
+import java.util.Objects
 
 class SendEMailAction extends in.handyman.command.Action with LazyLogging {
 
@@ -58,7 +59,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     val con = ResourceAccess.rdbmsConn(source)
     st = con.createStatement()
     con.setAutoCommit(false)
-    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width: max-content;max-width:max-content;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:#98dcff;}</style></head><body>"
+    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width:max-content; max-width:max-content;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:#98dcff;}</style></head><body>"
     sqlList.foreach { sql =>
       if (!sql.trim.isEmpty()) {
         logger.info(aMarker, "Transform id#{}, executing script {}", id, sql.trim)
@@ -86,14 +87,18 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
                 text = text + "<tr>"
               }
               colorCount = colorCount + 1
-
               colData.stream().forEach(entry => {
-                var value = rs.getObject(entry).toString()
-                if (value.contains(".")) {
-                  value = value.substring(0, value.indexOf("."));
+                if (rs.getObject(entry) != null) {
+                  var value = rs.getObject(entry).toString()
+                  if (value.contains(".") && Objects.nonNull(value)) {
+                    value = value.substring(0, value.indexOf("."));
+                  }
+                  println(value)
+                  text = text + "<td>" + value + "</td>";
+                } else {
+                  text = text + "<td>" + rs.getObject(entry) + "</td>";
                 }
-                println(value)
-                text = text + "<td>" + value + "</td>";
+
               })
               text = text + "</tr>"
             } while (rs.next());
