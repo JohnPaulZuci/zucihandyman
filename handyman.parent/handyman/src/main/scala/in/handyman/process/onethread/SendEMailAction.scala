@@ -51,6 +51,8 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     var subject = mail.getSubject
     subject = subject.concat(" " + formatter.format(date))
     var content = mail.getBody
+    var smtpHost = mail.getSmtphost
+    var smtpPort = mail.getSmtpport
     //    content = content.concat("<br>Please find the result of the pipeline below:<br>")
     val to = mail.getTo
     val cc = mail.getCc
@@ -146,8 +148,8 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
 
       def createMessage: Message = {
         val properties = new Properties()
-        properties.put("mail.smtp.host", "smtp.gmail.com")
-        properties.put("mail.smtp.port", "587")
+        properties.put("mail.smtp.host", smtpHost)
+        properties.put("mail.smtp.port", smtpPort)
         properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         properties.put("mail.smtp.auth", "true")
         properties.put("mail.smtp.starttls.enable", "true") //TLS

@@ -91,7 +91,8 @@ Mail:
 	'}' 'on-condition' condition=Expression;
 
 SendEMail:
-	'sendemail' 'as' name=STRING 'db' source=STRING 'from' from=STRING 'pass' pass=STRING 'to' to=STRING 'cc' cc=STRING
+	'sendemail' 'as' name=STRING 'db' source=STRING 'smtp-host' smtphost=STRING 'smtp-port' smtpport=STRING 
+	'from' from=STRING 'pass' pass=STRING 'to' to=STRING 'cc' cc=STRING
 	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'signature' signature=STRING 'using'
 	'{'
 	value=SelectStatement
