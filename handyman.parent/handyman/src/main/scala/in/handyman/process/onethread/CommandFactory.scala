@@ -51,7 +51,7 @@ object CommandFactory {
       case "writecsv" => new WriteCsvAndTsvAction
       case "nlptextpreprocessing" => new NLPTextPreprocessingAction
       case "dropboxcleanup" => new DropboxCleanupAction
-
+      case "mongo2db" => new Mongo2DbAction
     }
   }
 }

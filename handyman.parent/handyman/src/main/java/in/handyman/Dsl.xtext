@@ -67,7 +67,8 @@ Action:
 	| Mahout
 	| Terminal
 	| NLPTextPreprocessing
-	| DropboxCleanup);
+	| DropboxCleanup
+	| Mongo2Db);
 
 DeleteFolder:
 	'deletefolder' 'as' name=STRING 'folder' foldersource=STRING 'zipfile' zipsource=STRING
@@ -334,6 +335,15 @@ Transform:
 	'transform' 'as' name=STRING 'on' on=STRING 'using'
 	'{'
 	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+Mongo2Db:
+	'mongo2db' 'as' name=STRING 'from' sourceConnStr=STRING 'to' to=STRING 'srcDb' sourceDb=STRING 'targetTable' targetTable=STRING 
+	'by-filter' filter=STRING 'by-batch' limit=STRING 'find-attribute' findAttr=STRING 'apply-manipulation' applyManipulation=STRING 
+	'on-updatekey' onUpdateKey=STRING
+	'using'
+	'{'
+	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
 Column:
