@@ -102,7 +102,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
           
           query = query.substring(0, query.length() - 1) + "),"
           
-          if (rowsProcessed % 10 == 0) {
+          if (rowsProcessed % limit == 0) {
   
             query = query.replace("\"null\"", "null")
             logger.info("WriteCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, source, query)
