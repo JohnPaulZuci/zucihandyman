@@ -9,6 +9,7 @@ import java.util.HashMap
 import java.util.HashSet
 
 import org.bson.Document
+import org.json.JSONArray
 import org.json.JSONObject
 
 import com.mongodb.BasicDBObject
@@ -48,8 +49,30 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     val manipFunc: String = mongo2Db.getApplyManipulation
     val onUpdateKey: String = mongo2Db.getOnUpdateKey
     
-    val methodMap : HashMap[String, Method] = new HashMap[String, Method]()
+    val connResource: Resource = ConfigurationService.getResourceConfig(source)
+    val srcConnStr = connResource.url
     
+    var sqlSelect : String = ddlSql.substring(ddlSql.toUpperCase().indexOf("SELECT") + 7, ddlSql.toUpperCase().indexOf("FROM"))
+    var sqlFrom: String = ddlSql.substring(ddlSql.toUpperCase().indexOf("FROM") + 5, ddlSql.length())
+    
+    var (insFieldsMap, insAndSelFieldsMap, projectFields) = getInsertAndSelectFields(sqlSelect)
+    var (updateStr, insertStr, inFieldArr, insertFields) = prepareInsertUpdateFields(insFieldsMap, insAndSelFieldsMap)
+    
+    var onUpdateStr:String = ""
+    if(onUpdateKey != null && !onUpdateKey.isEmpty()){
+      onUpdateStr = onUpdateStr + "target." + onUpdateKey + " = source." + onUpdateKey
+    }
+    
+    val mongoClient : MongoClient = MongoClients.create(srcConnStr)
+    val mongoDatabase : MongoDatabase = mongoClient.getDatabase(sourceDb)
+    val coll : MongoCollection[Document]	=  mongoDatabase.getCollection(sqlFrom)
+    var mongoCursor : MongoCursor[Document] = findAndFetch(filter, coll, projectFields)
+
+    val mongo2DbDbConnto = ResourceAccess.rdbmsConn(destination)
+    val mongo2DbStmtto = mongo2DbDbConnto.createStatement
+    mongo2DbDbConnto.setAutoCommit(false)
+    
+    val methodMap : HashMap[String, Method] = new HashMap[String, Method]()
     var javaBso : Any = null;
     if(manipFunc != null){
       val clazz = this.getClass.getClassLoader.loadClass(manipFunc)
@@ -60,97 +83,6 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       
       javaBso = clazz.newInstance()
     }
-          
-    val connResource: Resource = ConfigurationService.getResourceConfig(source)
-    val srcConnStr = connResource.url
-    
-    val mongoClient : MongoClient = MongoClients.create(srcConnStr)
-    val mongoDatabase : MongoDatabase = mongoClient.getDatabase(sourceDb)
-    
-    var sqlSelect : String = ddlSql.substring(ddlSql.toUpperCase().indexOf("SELECT") + 7, ddlSql.toUpperCase().indexOf("FROM"))
-    var sqlFrom: String = ddlSql.substring(ddlSql.toUpperCase().indexOf("FROM") + 5, ddlSql.length())
-    
-    val coll : MongoCollection[Document]	=  mongoDatabase.getCollection(sqlFrom)
-    
-    val projectFields : BasicDBObject = new BasicDBObject()
-    val selectFields : Array[String] = sqlSelect.split(",");
-    var insertFields : String = "";
-    val insFieldsMap : HashSet[String] = new HashSet[String]
-    val insAndSelFieldsMap : HashMap[String, String] = new HashMap[String, String]
-    for (col <- selectFields) {
-      val colStr : String = col.trim().toString()
-      var aliasCol : String = null;
-      var dbCol : String = null;
-      if(colStr.contains(" as ")){
-        val colWithAlias : Array[String] = colStr.split(" as ")
-        dbCol = colWithAlias(0).trim()
-        aliasCol = colWithAlias(1).trim()
-      }else{
-        dbCol = colStr
-        aliasCol = colStr
-      }
-      
-      /*if(dbCol.contains(".key")){
-        projectFields.append(dbCol.substring(0, dbCol.indexOf("key")-1), 1);        
-      }else{*/
-        projectFields.append(dbCol, 1)
-      //}
-      insFieldsMap.add(aliasCol.trim());
-      insAndSelFieldsMap.put(aliasCol.trim(), dbCol.trim())
-    }
-    
-    val inFieldArr = insFieldsMap.toArray()
-    var updateStr : String = "";
-    var insertStr : String = "";
-    for (inField <- inFieldArr) {
-      val dbCol  = insAndSelFieldsMap.get(inField)
-      
-      if(dbCol.contains("[")){
-        insertFields = insertFields + inField + ","
-        updateStr = updateStr + "target." + inField + " = source." + inField + ","
-        insertStr = insertStr + "source." + inField + ","  
-        
-        val colStr : Array[String] = dbCol.substring(dbCol.indexOf("[")+1, dbCol.indexOf("]")).split(":")
-        var colss: String = ""
-        for (colS <- colStr) {
-          colss = colS
-          if(colS.contains(" alias ")){
-            val colWithAlias : Array[String] = colS.split(" alias ")
-            colss = colWithAlias(1).trim()
-          }
-          insertFields = insertFields + colss + ","
-          updateStr = updateStr + "target." + colss + " = source." + colss + ","
-          insertStr = insertStr + "source." + colss + ","  
-        }
-      }else{
-        insertFields = insertFields + inField + ","
-      
-        if(!inField.equals("application_id")){
-          updateStr = updateStr + "target." + inField + " = source." + inField + ","
-        }
-        insertStr = insertStr + "source." + inField + ","  
-      }
-    }
-    
-    insertFields = insertFields.substring(0, insertFields.length() - 1)
-    updateStr = updateStr.substring(0, updateStr.length() - 1)
-    insertStr = insertStr.substring(0, insertStr.length() - 1)
-    
-    var onUpdateStr:String = ""
-    if(onUpdateKey != null && !onUpdateKey.isEmpty()){
-      onUpdateStr = onUpdateStr + "target." + onUpdateKey + " = source." + onUpdateKey
-    }
-    
-    var mongoCursor : MongoCursor[Document] = null
-    if(filter != null && !filter.isEmpty()) {
-      mongoCursor = applyFilter(filter, coll, projectFields)
-    }else{
-      mongoCursor = coll.find().projection(projectFields).iterator()
-    }
-
-    val mongo2DbDbConnto = ResourceAccess.rdbmsConn(destination)
-    val mongo2DbStmtto = mongo2DbDbConnto.createStatement
-    mongo2DbDbConnto.setAutoCommit(false)
     
     var query: String = ""
     try{
@@ -158,66 +90,17 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
         while (mongoCursor.hasNext()) {
           var doc : Document = mongoCursor.next();
           
-         /* val docjsonStr : String = doc.toJson(JsonWriterSettings.builder().build());
-          val docJsonObj: JSONObject = new JSONObject(docjsonStr);
-          val updatedatStr:String = String.valueOf(docJsonObj.getJSONObject("updatedat").get("$date"))
-          System.out.println(docjsonStr);
-          System.out.println(doc.toJson());*/
-          
           query = query + "("
           for (col <- inFieldArr) {
             val colStr : String = col.toString().trim()
             var dbCol = insAndSelFieldsMap.get(colStr);
             
-            /*if(dbCol.contains(".key")){
-              var query1 = query
-              val dbCol1 = dbCol.substring(0, dbCol.indexOf("key")-1)
-              var colVal : Object = getColumn(colStr, dbCol1, doc, javaBso, methodMap)    
-              
-              if(colVal != null){
-                  val colValDoc = colVal.asInstanceOf[Document]
-                  val keySet : java.util.Set[String]  = colValDoc.keySet()
-                  val iterStr : java.util.Iterator[String] = keySet.iterator()
-                  while(iterStr.hasNext()){
-                    val key = iterStr.next()
-                    
-                    query1 = appendColumn(key, query1)
-                    
-                    val colStr : Array[String] = dbCol.substring(dbCol.indexOf("[")+1, dbCol.indexOf("]")).split(":")
-                    var colss: String = ""
-                    for (colS <- colStr) {
-                      colss = colS
-                      if(colS.contains(" alias ")){
-                        val colWithAlias : Array[String] = colS.split(" alias ")
-                        colss = colWithAlias(0).trim()
-                      }
-                      colVal = colValDoc.get(key).asInstanceOf[Document].get(colss)
-                      query1 = appendColumn(colVal, query1)    
-                    }
-                    
-                    query1 = query1.substring(0, query1.length() - 1) + "),"
-                  }                
-              }else{
-                query1 = query1 + null + ","  
-                
-                val colStr : Array[String] = dbCol.substring(dbCol.indexOf("[")+1, dbCol.indexOf("]")).split(":")
-                for (colS <- colStr) {
-                  query1 = query1 + null + ","
-                }         
-                
-                query1 = query1.substring(0, query1.length() - 1) + "),"
-              }
-              
-              query = query1
-            }else{*/
-              var colVal : Object = getColumn(colStr, dbCol, doc, javaBso, methodMap)    
-              
-              query = appendColumn(colVal, query)
-            //}
+            var colVal : Object = getColumn(colStr, dbCol, doc, javaBso, methodMap)    
+            
+            query = appendColumn(colVal, query)
           }
           
-          //if(!query.indexOf(query.length()-1).equals(")"))
-            query = query.substring(0, query.length() - 1) + "),"
+          query = query.substring(0, query.length() - 1) + "),"
           
           if (rowsProcessed % 10 == 0) {
   
@@ -264,6 +147,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     }catch {
       case ex: SQLException => {
         ex.printStackTrace()
+        throw ex
       }
     } finally {
       if(mongoCursor != null)
@@ -292,37 +176,113 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
 
     context
   }
-  
-   def appendColumn(colVal: Object, query : String) : String = {
-     var queryAppend = query
-     
-      if(colVal != null){
-         var colValStr = colVal.toString()
-         
-          if((colVal.isInstanceOf[Integer] || colVal.isInstanceOf[Double])){
-             if(!colValStr.equals(""))
-               queryAppend = queryAppend + colValStr + "," 
-             else 
-               queryAppend = queryAppend + null + ","    
-          }else if(colVal.isInstanceOf[Date]){
-            colValStr = formatDate(colVal);
-            if(colValStr != null && !colValStr.isEmpty()){
-              queryAppend = queryAppend + colValStr + ","               
-            }else{
-              queryAppend = queryAppend + "''" + ","
-            }
-          }
-          else{
-            if(colValStr.contains("'"))
-              colValStr = colValStr.replaceAll("'", "''")
+
+  def getInsertAndSelectFields(sqlSelect: String) = {
+    val projectFields : BasicDBObject = new BasicDBObject()
+    val selectFields : Array[String] = sqlSelect.split(",");
+    val insFieldsMap : HashSet[String] = new HashSet[String]
+    val insAndSelFieldsMap : HashMap[String, String] = new HashMap[String, String]
+    for (col <- selectFields) {
+      val colStr : String = col.trim().toString()
+      var aliasCol : String = null;
+      var dbCol : String = null;
+      if(colStr.contains(" as ")){
+        val colWithAlias : Array[String] = colStr.split(" as ")
+        dbCol = colWithAlias(0).trim()
+        aliasCol = colWithAlias(1).trim()
+      }else{
+        dbCol = colStr
+        aliasCol = colStr
+      }
+      
+      projectFields.append(dbCol, 1)
+      insFieldsMap.add(aliasCol.trim());
+      insAndSelFieldsMap.put(aliasCol.trim(), dbCol.trim())
+    }
+    
+    (insFieldsMap, insAndSelFieldsMap, projectFields)
+  }
+
+  def prepareInsertUpdateFields(insFieldsMap: java.util.HashSet[String], insAndSelFieldsMap: java.util.HashMap[String,String]) = {
+    val inFieldArr = insFieldsMap.toArray()
+    var updateStr : String = "";
+    var insertStr : String = "";
+    var insertFields : String = "";
+    for (inField <- inFieldArr) {
+      val dbCol  = insAndSelFieldsMap.get(inField)
+      
+      if(dbCol.contains("[")){
+        insertFields = insertFields + inField + ","
+        updateStr = updateStr + "target." + inField + " = source." + inField + ","
+        insertStr = insertStr + "source." + inField + ","  
         
-            queryAppend = queryAppend + "\'" + colValStr + "\'" + ","         
+        val colStr : Array[String] = dbCol.substring(dbCol.indexOf("[")+1, dbCol.indexOf("]")).split(":")
+        var colss: String = ""
+        for (colS <- colStr) {
+          colss = colS
+          if(colS.contains(" alias ")){
+            val colWithAlias : Array[String] = colS.split(" alias ")
+            colss = colWithAlias(1).trim()
           }
-       }
-      else
-          queryAppend = queryAppend + null + ","  
-          
-      return queryAppend
+          insertFields = insertFields + colss + ","
+          updateStr = updateStr + "target." + colss + " = source." + colss + ","
+          insertStr = insertStr + "source." + colss + ","  
+        }
+      }else{
+        insertFields = insertFields + inField + ","
+      
+        if(!inField.equals("application_id")){
+          updateStr = updateStr + "target." + inField + " = source." + inField + ","
+        }
+        insertStr = insertStr + "source." + inField + ","  
+      }
+    }
+    
+    insertFields = insertFields.substring(0, insertFields.length() - 1)
+    updateStr = updateStr.substring(0, updateStr.length() - 1)
+    insertStr = insertStr.substring(0, insertStr.length() - 1)
+    
+    (updateStr, insertStr, inFieldArr, insertFields)
+  }
+  
+  def appendColumn(colVal: Object, query : String) : String = {
+    var queryAppend = query
+    
+     if(colVal != null){
+        var colValStr = colVal.toString()
+        
+         if((colVal.isInstanceOf[Integer] || colVal.isInstanceOf[Double])){
+            if(!colValStr.equals(""))
+              queryAppend = queryAppend + colValStr + "," 
+            else 
+              queryAppend = queryAppend + null + ","    
+         }else if((colVal.isInstanceOf[java.util.ArrayList[_]])){
+           val colValObj = colVal.asInstanceOf[java.util.ArrayList[_]] 
+           if(colValObj != null && !colValObj.isEmpty()){
+             colValStr = colValObj.get(0).toString()
+             queryAppend = queryAppend + "\'" + colValStr + "\'" + ","   
+           }else{
+             queryAppend = queryAppend + null + "," 
+           }
+         }else if(colVal.isInstanceOf[Date]){
+           colValStr = formatDate(colVal);
+           if(colValStr != null && !colValStr.isEmpty()){
+             queryAppend = queryAppend + colValStr + ","               
+           }else{
+             queryAppend = queryAppend + "''" + ","
+           }
+         }
+         else{
+           if(colValStr.contains("'"))
+             colValStr = colValStr.replaceAll("'", "''")
+       
+           queryAppend = queryAppend + "\'" + colValStr + "\'" + ","         
+         }
+      }
+     else
+         queryAppend = queryAppend + null + ","  
+         
+     return queryAppend
 	}
   
   def formatDate(date: Object) : String = {
@@ -342,7 +302,10 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       val dbColForm = dbCol.substring(0, dbCol.indexOf("."))
       val dbColFunc = dbCol.substring(dbCol.indexOf(".")+1, dbCol.length())
       val obje: Object = docObj.get(dbColForm)
-      if(obje.isInstanceOf[java.util.ArrayList[_]]){
+      if(obje.isInstanceOf[java.util.ArrayList[Document]]){
+        val obje1 = obje.asInstanceOf[java.util.ArrayList[Document]]
+        return obje1.get(0)
+      }else if(obje.isInstanceOf[java.util.ArrayList[_]]){
         return obje
       }else{
         val doc1 : Document = docObj.get(dbColForm, classOf[Document])
@@ -364,17 +327,22 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
         return retObj                
       }
     }else{
-      val docNew = getColNestedDocIfExists(doc, dbCol).asInstanceOf[Document]
-      if(docNew != null){
-        if(dbCol.contains(".")){
-          val colValObj = docNew.get(dbCol.substring(dbCol.lastIndexOf(".")+1 , dbCol.length()));     
-          if(colValObj != null)
-            return colValObj
-          }else{
-            val obj : Object = docNew.get(dbCol);
-            if(obj != null)
-              return obj      
-          }                
+      val docNew = getColNestedDocIfExists(doc, dbCol)
+      if(docNew.isInstanceOf[Document]){
+        val docNew1 = docNew.asInstanceOf[Document]
+        if(docNew1 != null){
+          if(dbCol.contains(".")){
+            val colValObj = docNew1.get(dbCol.substring(dbCol.lastIndexOf(".")+1 , dbCol.length()));     
+            if(colValObj != null)
+              return colValObj
+            }else{
+              val obj : Object = docNew1.get(dbCol);
+              if(obj != null)
+                return obj      
+            }                
+        }
+      }else{
+        return docNew;
       }
     }
     
@@ -382,26 +350,46 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
   }
 
   // filter format {'column':'updatedat', 'type':'date', 'format':'yyyy-MM-dd HH:mm:ss.SSS ZZZ', 'operator':'$gt', 'value':'2020-06-25 09:28:04.041 UTC'}
-  def applyFilter(filter: String, coll: com.mongodb.client.MongoCollection[org.bson.Document], 
+  def findAndFetch(filter: String, coll: com.mongodb.client.MongoCollection[org.bson.Document], 
       projectFields : BasicDBObject) : com.mongodb.client.MongoCursor[org.bson.Document] = {
-    val obj: JSONObject = new JSONObject(filter);
-    val col:String = String.valueOf(obj.get("column"))
-    val operator:String = String.valueOf(obj.get("operator"))
-    var colVal:String = String.valueOf(obj.get("value"))
-    val colType:String = String.valueOf(obj.get("type"))
-    val colFormat:String = String.valueOf(obj.get("format"))
     
-    var colFormatted: Date = null;
-    var filDbObj: BasicDBObject = null;
-    if(colType.equals("date") && !colFormat.isEmpty()){
-      colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
-      filDbObj = new BasicDBObject(col, new BasicDBObject(operator, colFormatted));
-    }else{
-      filDbObj = new BasicDBObject(col, new BasicDBObject(operator, colVal));
+    val jsonArr: JSONArray = new JSONArray(filter);
+    var filObj: BasicDBObject = null;
+    var col:String = "";
+    for (i <- 0 to jsonArr.length()-1) {
+      val jsonObj : JSONObject = jsonArr.get(i).asInstanceOf[JSONObject];
+      
+      col = String.valueOf(jsonObj.get("column"))
+      val operator:String = String.valueOf(jsonObj.get("operator"))
+      var colVal:String = String.valueOf(jsonObj.get("value"))
+      val colType:String = String.valueOf(jsonObj.get("type"))
+      val colFormat:String = String.valueOf(jsonObj.get("format"))
+      
+      if(colVal != null && !colVal.isEmpty()){
+        var colFormatted: Date = null;
+        if(colType.equals("date") && !colFormat.isEmpty()){
+          colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
+          
+          if(filObj == null){
+            filObj = new BasicDBObject(operator, colFormatted);
+          }
+          else{
+            filObj = filObj.append(operator, colFormatted);            
+          }
+        }else{
+          filObj = new BasicDBObject(operator, colVal);
+        }
+      }
     }
     
-    val findIterate : FindIterable[Document] = coll.find(filDbObj).projection(projectFields)
-    findIterate.iterator()
+    if(filObj != null){
+      var filDbObj: BasicDBObject = new BasicDBObject(col, filObj);
+      val findIterate : FindIterable[Document] = coll.find(filDbObj).projection(projectFields)
+      
+      return findIterate.iterator()
+    }else{
+      return coll.find().projection(projectFields).iterator()
+    }
   }
   
   // find attribute format {'column':'updatedat', 'type':'date', 'format':'yyyy-MM-dd HH:mm:ss.SSS ZZZ', 'function':'max', 'context_column':'max_updatedat'}

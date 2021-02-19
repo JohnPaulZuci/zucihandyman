@@ -1,23 +1,12 @@
 package in.handyman.process.onethread
 
-import com.typesafe.scalalogging.LazyLogging
-import in.handyman.command.Action
-import in.handyman.command.Context
-import in.handyman.util.ResourceAccess
-import in.handyman.DslStandaloneSetup
-import in.handyman.server.PathResolver
-
-import in.handyman.command.TryContext
-import in.handyman.parser.antlr.DslParser
-import java.io.FileReader
-import in.handyman.server.ProcessExecutor
-import in.handyman.command.CommandProxy
-import in.handyman.server.ProcessAST
-import in.handyman.util.ParameterisationEngine
-import java.io.StringWriter
-import java.io.PrintWriter
-import in.handyman.util.ExceptionUtil
 import java.sql.SQLException
+
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.command.CommandProxy
+import in.handyman.util.ParameterisationEngine
+import in.handyman.util.ResourceAccess
 
 class CopydataAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
