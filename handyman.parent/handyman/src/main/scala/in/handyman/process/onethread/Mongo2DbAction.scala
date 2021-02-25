@@ -26,6 +26,9 @@ import in.handyman.config.ConfigurationService
 import in.handyman.config.Resource
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
+import com.mongodb.BasicDBList
+import java.util.ArrayList
+
 
 class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
@@ -102,14 +105,14 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
           
           query = query.substring(0, query.length() - 1) + "),"
           
-          if (rowsProcessed % limit == 0) {
+          if (rowsProcessed % 500 == 0) {
   
             query = query.replace("\"null\"", "null")
             logger.info("WriteCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, source, query)
   
             var insert: String = ""
             if(onUpdateKey != null && !onUpdateKey.isEmpty()){
-              insert = "MERGE INTO " + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) + 
+              insert = "MERGE INTO OnlineLending.dbo." + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) + 
                                  ") AS source (" + insertFields + ") ON (" + onUpdateStr + ") WHEN MATCHED THEN UPDATE SET " +
                                  updateStr + " WHEN NOT MATCHED THEN INSERT (" + insertFields + ") VALUES (" + insertStr +");";              
             }else{
@@ -131,7 +134,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
           query = query.replace("\"null\"", "null")
           var insert: String = ""
           if(onUpdateKey != null && !onUpdateKey.isEmpty()){
-            insert = "MERGE INTO " + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) + 
+            insert = "MERGE INTO OnlineLending.dbo." + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) + 
                                ") AS source (" + insertFields + ") ON (" + onUpdateStr + ") WHEN MATCHED THEN UPDATE SET " +
                                updateStr + " WHEN NOT MATCHED THEN INSERT (" + insertFields + ") VALUES (" + insertStr +");";              
           }else{
@@ -147,7 +150,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     }catch {
       case ex: SQLException => {
         ex.printStackTrace()
-        throw ex
+        //throw ex
       }
     } finally {
       if(mongoCursor != null)
@@ -355,6 +358,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     
     val jsonArr: JSONArray = new JSONArray(filter);
     var filObj: BasicDBObject = null;
+    var filObj2: BasicDBObject = null;
     var col:String = "";
     for (i <- 0 to jsonArr.length()-1) {
       val jsonObj : JSONObject = jsonArr.get(i).asInstanceOf[JSONObject];
@@ -365,7 +369,11 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       val colType:String = String.valueOf(jsonObj.get("type"))
       val colFormat:String = String.valueOf(jsonObj.get("format"))
       
-      if(colVal != null && !colVal.isEmpty()){
+      if(col.equals("type")){
+        filObj2 = new BasicDBObject(operator, colVal);
+      }
+      
+      if(colVal != null && !colVal.isEmpty() && !col.equals("type")){
         var colFormatted: Date = null;
         if(colType.equals("date") && !colFormat.isEmpty()){
           colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
@@ -383,12 +391,21 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     }
     
     if(filObj != null){
-      var filDbObj: BasicDBObject = new BasicDBObject(col, filObj);
-      val findIterate : FindIterable[Document] = coll.find(filDbObj).projection(projectFields)
+      var filDbObj: BasicDBObject = new BasicDBObject("updatedat", filObj);
+      
+      var andQuery : BasicDBObject = new BasicDBObject();
+      var obj : ArrayList[BasicDBObject] = new ArrayList[BasicDBObject]();
+      obj.add(filDbObj);
+      if(filObj2 != null){
+        obj.add(new BasicDBObject(col, filObj2));        
+      }
+      andQuery.put("$and", obj);
+      
+      val findIterate : FindIterable[Document] = coll.find(andQuery).batchSize(500).projection(projectFields)
       
       return findIterate.iterator()
     }else{
-      return coll.find().projection(projectFields).iterator()
+      return coll.find().batchSize(500).projection(projectFields).iterator()
     }
   }
   
