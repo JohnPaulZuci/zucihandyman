@@ -156,7 +156,9 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       if(mongoCursor != null)
         mongoCursor.close();
       
+      if(mongoClient != null)
         mongoClient.close();
+      
         mongo2DbStmtto.close()
         mongo2DbDbConnto.close()
         
