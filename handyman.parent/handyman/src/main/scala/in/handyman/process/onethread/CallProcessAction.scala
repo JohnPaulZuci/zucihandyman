@@ -79,7 +79,8 @@ class CallProcessAction extends in.handyman.command.Action with LazyLogging {
            try{
               rs.close
               stmt.close
-              conn.close
+              if(conn != null && conn.isClosed())
+                conn.close
               }catch{
                case ex: Throwable => {
                   handleError(ex)
