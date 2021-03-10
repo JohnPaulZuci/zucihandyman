@@ -46,6 +46,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     val source = mongo2Db.getSourceConnStr
     val destination = mongo2Db.getTo
     val sourceDb = mongo2Db.getSourceDb
+    val targetDb = mongo2Db.getTargetDb
     val name = mongo2Db.getName
     val ddlSql: String = mongo2Db.getValue.replaceAll("\"", "")
     val id = context.getValue("process-id")
@@ -117,7 +118,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
 
             var insert: String = ""
             if (onUpdateKey != null && !onUpdateKey.isEmpty()) {
-              insert = "MERGE INTO OnlineLending.dbo." + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) +
+              insert = "MERGE INTO " + targetDb + ".dbo." + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) +
                 ") AS source (" + insertFields + ") ON (" + onUpdateStr + ") WHEN MATCHED THEN UPDATE SET " +
                 updateStr + " WHEN NOT MATCHED THEN INSERT (" + insertFields + ") VALUES (" + insertStr + ");";
             } else {
@@ -140,7 +141,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
           query = query.replace("\"null\"", "null")
           var insert: String = ""
           if (onUpdateKey != null && !onUpdateKey.isEmpty()) {
-            insert = "MERGE INTO OnlineLending.dbo." + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) +
+            insert = "MERGE INTO " + targetDb + ".dbo." + table + " AS target USING (VALUES " + query.substring(0, query.length() - 1) +
               ") AS source (" + insertFields + ") ON (" + onUpdateStr + ") WHEN MATCHED THEN UPDATE SET " +
               updateStr + " WHEN NOT MATCHED THEN INSERT (" + insertFields + ") VALUES (" + insertStr + ");";
           } else {
@@ -371,49 +372,48 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
   // filter format {'column':'updatedat', 'type':'date', 'format':'yyyy-MM-dd HH:mm:ss.SSS ZZZ', 'operator':'$gt', 'value':'2020-06-25 09:28:04.041 UTC'}
   def findAndFetch(filter: String, coll: com.mongodb.client.MongoCollection[org.bson.Document],
     projectFields: BasicDBObject): com.mongodb.client.MongoCursor[org.bson.Document] = {
-
+    
     val jsonArr: JSONArray = new JSONArray(filter);
-    var filObj: BasicDBObject = null;
-    var filObj2: BasicDBObject = null;
     var col: String = "";
+    var obj: ArrayList[BasicDBObject] = new ArrayList[BasicDBObject]();
     for (i <- 0 to jsonArr.length() - 1) {
+      var filObj: BasicDBObject = null;
       val jsonObj: JSONObject = jsonArr.get(i).asInstanceOf[JSONObject];
 
       col = String.valueOf(jsonObj.get("column"))
-      val operator: String = String.valueOf(jsonObj.get("operator"))
-      var colVal: String = String.valueOf(jsonObj.get("value"))
       val colType: String = String.valueOf(jsonObj.get("type"))
       val colFormat: String = String.valueOf(jsonObj.get("format"))
 
-      if (col.equals("type")) {
-        filObj2 = new BasicDBObject(operator, colVal);
-      }
-
-      if (colVal != null && !colVal.isEmpty() && !col.equals("type")) {
-        var colFormatted: Date = null;
-        if (colType.equals("date") && !colFormat.isEmpty()) {
-          colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
-
-          if (filObj == null) {
-            filObj = new BasicDBObject(operator, colFormatted);
+      val condArr: JSONArray = new JSONArray(String.valueOf(jsonObj.get("condition")));
+      for (j <- 0 to condArr.length() - 1) {
+        val condObj: JSONObject = condArr.get(j).asInstanceOf[JSONObject];
+        val operator: String = String.valueOf(condObj.get("operator"))
+        var colVal: String = String.valueOf(condObj.get("value"))
+        
+        if (colVal != null && !colVal.isEmpty()) {
+          var colFormatted: Date = null;
+          if (colType.equals("date") && !colFormat.isEmpty()) {
+            colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
+  
+            if (filObj == null) {
+              filObj = new BasicDBObject(operator, colFormatted);
+            } else {
+              filObj = filObj.append(operator, colFormatted);
+            }
           } else {
-            filObj = filObj.append(operator, colFormatted);
+              if (filObj == null) {
+                filObj = new BasicDBObject(operator, colVal);
+              } else {
+                filObj = filObj.append(operator, colVal);
+              }
           }
-        } else {
-          filObj = new BasicDBObject(operator, colVal);
         }
       }
+      obj.add(new BasicDBObject(col, filObj));
     }
 
-    if (filObj != null) {
-      var filDbObj: BasicDBObject = new BasicDBObject("updatedat", filObj);
-
+    if (!obj.isEmpty()) {
       var andQuery: BasicDBObject = new BasicDBObject();
-      var obj: ArrayList[BasicDBObject] = new ArrayList[BasicDBObject]();
-      obj.add(filDbObj);
-      if (filObj2 != null) {
-        obj.add(new BasicDBObject(col, filObj2));
-      }
       andQuery.put("$and", obj);
 
       val findIterate: FindIterable[Document] = coll.find(andQuery).batchSize(fetchSize.toInt).projection(projectFields)
