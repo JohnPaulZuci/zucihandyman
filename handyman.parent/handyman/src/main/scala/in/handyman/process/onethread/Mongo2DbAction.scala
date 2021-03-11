@@ -39,8 +39,6 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     val mongo2Db: in.handyman.dsl.Mongo2Db = CommandProxy.createProxy(mongo2DbAsIs, classOf[in.handyman.dsl.Mongo2Db], context)
 
     val configMap = ConfigurationService.getGlobalconfig()
-    fetchSize = configMap.getOrElse("fetch_size", "20000")
-    val writeSize: String = configMap.getOrElse("write_size", "500")
     var rowsProcessed: Int = 1
 
     val source = mongo2Db.getSourceConnStr
@@ -57,6 +55,8 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     val findAttr: String = mongo2Db.getFindAttr
     val manipFunc: String = mongo2Db.getApplyManipulation
     val onUpdateKey: String = mongo2Db.getOnUpdateKey
+    fetchSize = mongo2Db.getFetchBatchSize
+    val writeSize: String = mongo2Db.getWriteBatchSize
 
     val connResource: Resource = ConfigurationService.getResourceConfig(source)
     val srcConnStr = connResource.url
