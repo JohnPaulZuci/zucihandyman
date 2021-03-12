@@ -77,25 +77,27 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     val coll: MongoCollection[Document] = mongoDatabase.getCollection(sqlFrom)
     var mongoCursor: MongoCursor[Document] = findAndFetch(filter, coll, projectFields)
 
-    val mongo2DbDbConnto = ResourceAccess.rdbmsConn(destination)
-    val mongo2DbStmtto = mongo2DbDbConnto.createStatement
-    mongo2DbDbConnto.setAutoCommit(false)
-
-    val methodMap: HashMap[String, Method] = new HashMap[String, Method]()
-    var javaBso: Any = null;
-    if (manipFunc != null) {
-      val clazz = this.getClass.getClassLoader.loadClass(manipFunc)
-      val decMethods: Array[Method] = clazz.getDeclaredMethods()
-      for (method <- decMethods) {
-        methodMap.put(method.getName, method)
-      }
-
-      javaBso = clazz.newInstance()
-    }
-
-    var query: String = ""
+    var mongo2DbDbConnto : java.sql.Connection = null;
+    var mongo2DbStmtto : java.sql.Statement = null;
     try {
       if (mongoCursor != null) {
+        mongo2DbDbConnto = ResourceAccess.rdbmsConn(destination)
+        mongo2DbStmtto = mongo2DbDbConnto.createStatement
+        mongo2DbDbConnto.setAutoCommit(false)
+    
+        val methodMap: HashMap[String, Method] = new HashMap[String, Method]()
+        var javaBso: Any = null;
+        if (manipFunc != null) {
+          val clazz = this.getClass.getClassLoader.loadClass(manipFunc)
+          val decMethods: Array[Method] = clazz.getDeclaredMethods()
+          for (method <- decMethods) {
+            methodMap.put(method.getName, method)
+          }
+    
+          javaBso = clazz.newInstance()
+        }
+
+        var query: String = ""
         while (mongoCursor.hasNext()) {
           var doc: Document = mongoCursor.next();
 
@@ -184,8 +186,11 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
         if (mongoClient != null)
           mongoClient.close
 
-        mongo2DbStmtto.close
-        mongo2DbDbConnto.close
+        if (mongo2DbStmtto != null && !mongo2DbStmtto.isClosed())
+          mongo2DbStmtto.close
+        
+        if (mongo2DbDbConnto != null && !mongo2DbDbConnto.isClosed())
+          mongo2DbDbConnto.close
       } catch {
         case ex: Throwable => {
           ex.printStackTrace
