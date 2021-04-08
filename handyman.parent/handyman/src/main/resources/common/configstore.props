@@ -1,5 +1,5 @@
 mysql= {
-  url = "jdbc:mysql://mariadb-node:3306/spw_config?useUnicode=true&characterEncoding=utf8&dumpQueriesOnException=true"
+  url = "jdbc:mysql://172.18.0.1:3306/spw_config?useUnicode=true&characterEncoding=utf8&dumpQueriesOnException=true"
   driver = com.mysql.jdbc.Driver
   user=mfinance
   passwd=MFZucic0rp
