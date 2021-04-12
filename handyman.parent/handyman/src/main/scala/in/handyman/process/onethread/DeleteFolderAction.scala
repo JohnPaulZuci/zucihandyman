@@ -1,32 +1,16 @@
 package in.handyman.process.onethread
 
-import com.typesafe.scalalogging.LazyLogging
-import in.handyman.command.Context
-import scala.collection.JavaConversions._
-import in.handyman.command.Action
-import in.handyman.command.CommandProxy
-import in.handyman.util.ResourceAccess
-import org.eclipse.emf.common.util.EList
-import in.handyman.util.ParameterisationEngine
-import java.util.ArrayList
-import java.sql.SQLException
-import scala.util.control.Exception.Finally
-import java.io.{ BufferedReader, FileOutputStream, InputStreamReader }
-import org.slf4j.MarkerFactory
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.AmazonClientException
-import com.amazonaws.AmazonServiceException
 import java.io.File
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.FileOutputStream
-import org.apache.commons.io.IOUtils
-import scala.util.Try
 
-import java.io.File
-import java.nio.file.Files
 import scala.reflect.io.Directory
+
+import org.slf4j.MarkerFactory
+
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.command.CommandProxy
+import in.handyman.command.Context
+import in.handyman.util.ParameterisationEngine
 
 
 class DeleteFolderAction extends in.handyman.command.Action with LazyLogging {
