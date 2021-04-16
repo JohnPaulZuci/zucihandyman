@@ -14,6 +14,7 @@ import com.typesafe.scalalogging.LazyLogging
 import in.handyman.command.CommandProxy
 import in.handyman.config.ConfigurationService
 import in.handyman.util.ParameterisationEngine
+import in.handyman.audit.AuditService
 
 
 /**
@@ -38,23 +39,45 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
 
     val name = ftp.getName
     var localDir = ftp.getLocalDir
+    val localFile = ftp.getLocalFile
     val remoteDir = ftp.getRemoteDir
-    val action1 = ftp.getAction
+    val ftpAction = ftp.getAction
+    val userName = ftp.getUsername
+    val password = ftp.getPassword
+    val host = ftp.getHost
+    val port : Int = Integer.valueOf(ftp.getPort)
+    val remoteFile = ftp.getRemoteFile
+    val remote = remoteDir.concat(remoteFile)
+    val local = localDir.concat(localFile)
     
-    action1 match {
-      case "listFiles"  => listFiles
-      case "listFileNames"  => listFileNames
+    connect(host)
+    login(userName, password)
+    
+    ftpAction match {
+      case "listFiles"  => {
+        cd(remoteDir)
+        listFiles
+      }
+      case "listFileNames"  => {
+        cd(remoteDir)
+        AuditService.insertFTPFile(listFileNames, Integer.valueOf(instanceId))
+      }
+      case "downloadAllFiles"  => {
+        cd(remoteDir)
+        downloadAllFiles(localDir)
+      }
+      case "deleteFile"  => deleteFile(remote)
+      case "removeDir"  => removeDir(remote)
+      case "downloadFile"  => downloadFile(remote, local)
       case "cd"  => cd(remoteDir)
-      /*case "downloadFileStream"  => downloadFileStream
-      case "downloadAllFiles"  => downloadAllFiles(remoteDir, localDir)
-      case "deleteFile"  => deleteFile
-      case "removeDir"  => removeDir
-      case "downloadFile"  => downloadFile
-      case "uploadFile"  => uploadFile
-      case "login" => login
-      case "connect" => connect*/
+      case "md"  => md(remoteDir)
+      case "uploadFile"  => {
+        cd(remoteDir)
+        uploadFile(local)
+      }
     }
     
+    client.disconnect()
     context
   }
   
@@ -68,7 +91,10 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
 
   def connected: Boolean = client.isConnected
 
-  def disconnect(): Unit = client.disconnect()
+  def disconnect(): Unit = {
+    client.logout()
+    client.disconnect()
+  }
 
   def canConnect(host: String): Boolean = {
     client.connect(host)
@@ -80,13 +106,15 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
   def listFiles(): List[FTPFile] =
     client.listFiles.toList
 
-  def listFileNames(): ArrayList[String] = {
+  def listFileNames(): Array[String] = {
     val ftpFiles : List[FTPFile] = listFiles()
-    val ftpFileNames : ArrayList[String] = new ArrayList[String];
+    val ftpFileNames : Array[String] = new Array[String](ftpFiles.size);
     
+    var i : Int = 0; 
     for(fFile <- ftpFiles){
       if (fFile.isFile()) {
-        ftpFileNames.add(fFile.getName);
+        ftpFileNames(i) = fFile.getName;
+        i = i + 1;
       }
     }
     
@@ -95,6 +123,9 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
 
   def cd(path: String): Boolean =
     client.changeWorkingDirectory(path)
+    
+  def md(path: String): Boolean =
+    client.makeDirectory(path)
 
   def filesInCurrentDirectory: Seq[String] =
     listFiles().map(_.getName)
@@ -105,7 +136,7 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     stream
   }
 
-  def downloadAllFiles(remote: String, localDir: String) = {
+  def downloadAllFiles(localDir: String) = {
     val ftpFiles : List[FTPFile] = listFiles()
     val ftpFileNames : ArrayList[String] = new ArrayList[String];
     
@@ -132,15 +163,20 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     client.removeDirectory(remote)
   }
     
-  def downloadFile(remote: String): Boolean = {
-    val os = new FileOutputStream(new File(remote))
-    client.retrieveFile(remote, os)
+  def downloadFile(remote: String, local: String) {
+    val os = new FileOutputStream(new File(local))
+
+    if(client.retrieveFile(remote, os)){
+      logger.info(s"File download Successfull");
+    }
+    
+    os.close()
   }
   
-  def uploadFile(remote: String, localFileFullName: String) = {
+  def uploadFile(localFileFullName: String) = {
     var localFile : File = new File(localFileFullName);
     var input : FileInputStream = new FileInputStream(localFile);
-                 
+    
     if(client.storeFile(localFile.getName(), input)){
         logger.info(s"File Upload Successfull");
     }
