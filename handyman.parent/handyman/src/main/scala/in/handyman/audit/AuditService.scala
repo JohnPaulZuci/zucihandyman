@@ -6,6 +6,7 @@ import java.sql.Statement
 import in.handyman.util.ResourceAccess
 import com.typesafe.scalalogging.LazyLogging
 import org.slf4j.MarkerFactory
+import org.json.JSONObject
 
 object AuditService extends LazyLogging{
 
@@ -162,4 +163,73 @@ object AuditService extends LazyLogging{
       conn.close()
     }
   }
+  
+  def insertModelResponse(response: String) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    //logger.info(aMarker, "Obtained Connection for handle ={} for inserting the audit for process {}", auditService, instanceName)
+    val st = conn.prepareStatement("INSERT INTO model_response (sigma_id, template_name, pipeline_name, process_id, model_type, created_date) VALUES (?, ?, ?, ?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+      val jsonObj: JSONObject = new JSONObject(response);
+
+      val sigmaId: String = String.valueOf(jsonObj.get("sigma-id"))
+      val templateName: String = String.valueOf(jsonObj.get("template-name"))
+      val pipelineName: String = String.valueOf(jsonObj.get("pipeline-name"))
+      val processId: String = String.valueOf(jsonObj.get("process-id"))
+      val modelType: String = String.valueOf(jsonObj.get("model-type"))
+      
+      st.setString(1, sigmaId)
+      st.setString(2, templateName)
+      st.setString(3, pipelineName)
+      st.setString(4, processId)
+      st.setString(5, modelType)
+      
+      val rowsUpdated = st.executeUpdate()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+  
+    def insertModelTestingResponse(response: String) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    //logger.info(aMarker, "Obtained Connection for handle ={} for inserting the audit for process {}", auditService, instanceName)
+    val st = conn.prepareStatement("INSERT INTO model_testing_response (customer_goodness, principal_amount, interest_rate, waive_off_processing_fee, process_id, model_type, created_date) VALUES (?, ?, ?, ?, ?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+      val jsonObj: JSONObject = new JSONObject(response);
+
+      val custGoodness: String = String.valueOf(jsonObj.get("customer-goodness"))
+      val principalAmount: String = String.valueOf(jsonObj.get("principal-amount"))
+      val intRate: String = String.valueOf(jsonObj.get("interest-rate"))
+      val waiveOffProcessingFee: String = String.valueOf(jsonObj.get("waive-off-processing-fee"))
+      val processId: String = String.valueOf(jsonObj.get("process-id"))
+      val modelType: String = String.valueOf(jsonObj.get("model-type"))
+      
+      st.setString(1, custGoodness)
+      st.setString(2, principalAmount)
+      st.setString(3, intRate)
+      st.setString(4, waiveOffProcessingFee)
+      st.setString(5, processId)
+      st.setString(6, modelType)
+      
+      val rowsUpdated = st.executeUpdate()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+    
 }

@@ -42,6 +42,22 @@ Action:
 	| DeleteFolder
 	| Terminal
 	| SendEMail
+	| Mongo2Db
+	| FTP
+	| RandForestRegressModelTraining
+	| RandForestRegressModelTesting
+	| RandForestRegressModelEvaluation
+	| RandForestClassifyModelTraining
+	| RandForestClassifyModelTesting
+	| RandForestClassifyModelEvaluation
+	| GradBoostRegressModelTraining
+	| GradBoostRegressModelTesting
+	| GradBoostRegressModelEvaluation
+	| GradBoostClassifyModelTraining
+	| GradBoostClassifyModelTesting
+	| GradBoostClassifyModelEvaluation
+	| Unzip
+	| Zip
 	);
 	
 RestPart:
@@ -126,6 +142,131 @@ Transform:
 	'transform' 'as' name=STRING 'on' on=STRING 'using'
 	'{'
 	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+Mongo2Db:
+	'mongo2db' 'as' name=STRING 'from' sourceConnStr=STRING 'to' to=STRING 'srcDb' sourceDb=STRING 'targetDb' targetDb=STRING 'targetTable' targetTable=STRING 
+	'by-filter' filter=STRING 'by-batch' limit=STRING 'find-attribute' findAttr=STRING 'apply-manipulation' applyManipulation=STRING 
+	'on-updatekey' onUpdateKey=STRING 'with-fetch-batch-size' fetchBatchSize=STRING 'with-write-batch-size' writeBatchSize=STRING 
+	'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+FTP:
+	'ftp' 'as' name=STRING 'host' host=STRING 'username' username=STRING 'password' password=STRING 'action' action=STRING 
+	'local-dir' localDir=STRING 'remote-dir' remoteDir=STRING 'remote-file' remoteFile=STRING 'using' 
+	'{'
+	value=STRING
+	'}' 'on-condition' condition=Expression;
+	
+RandForestRegressModelTraining:
+	'randomforestregressionmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING 
+	'output-feature-name' featureName=STRING 'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+RandForestRegressModelTesting:
+	'randomforestregressionmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+RandForestRegressModelEvaluation:
+	'randomforestregressionmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+RandForestClassifyModelTraining:
+	'randomforestclassificationmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING 
+	'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+RandForestClassifyModelTesting:
+	'randomforestclassificationmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+RandForestClassifyModelEvaluation:
+	'randomforestclassificationmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+GradBoostRegressModelTraining:
+	'gradientboostregressionmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING 
+	'output-feature-name' featureName=STRING 'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+GradBoostRegressModelTesting:
+	'gradientboostregressionmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+GradBoostRegressModelEvaluation:
+	'gradientboostregressionmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+GradBoostClassifyModelTraining:
+	'gradientboostclassificationmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING 
+	'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+GradBoostClassifyModelTesting:
+	'gradientboostclassificationmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+GradBoostClassifyModelEvaluation:
+	'gradientboostclassificationmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
+	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING 
+	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+Zip:
+	'zip' 'as' name=STRING 'zip-file-path' zipFilePath=STRING 'zip-file-name' zipFileName=STRING 'source' source=STRING 
+	'buffer-size' bufferSize=STRING 'using' 
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+Unzip:
+	'unzip' 'as' name=STRING 'source' source=STRING 'dest-dir' destDir=STRING 'buffer-size' bufferSize=STRING 'using' 
+	'{'
+	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
 Column:

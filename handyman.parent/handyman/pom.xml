@@ -429,5 +429,26 @@
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.mongodb</groupId>
+		    <artifactId>mongo-java-driver</artifactId>
+		    <version>3.12.7</version>
+		</dependency>  
+		<!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
+		<dependency>
+		    <groupId>com.microsoft.sqlserver</groupId>
+		    <artifactId>mssql-jdbc</artifactId>
+		    <version>8.4.1.jre8</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.scalatest/scalatest -->
+		<dependency>
+		    <groupId>org.scalatest</groupId>
+		    <artifactId>scalatest_2.12</artifactId>
+		    <version>3.2.7</version>
+		    <!-- <scope>test</scope>  -->
+		</dependency>
+
 	</dependencies>
 </project>
