@@ -50,34 +50,48 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     val remote = remoteDir.concat(remoteFile)
     val local = localDir.concat(localFile)
     
-    connect(host)
-    login(userName, password)
+    detailMap.put("name", name)
+    detailMap.put("localDir", localDir)
+    detailMap.put("localFile", localFile)
+    detailMap.put("remoteDir", remoteDir)
+    detailMap.put("ftpAction", ftpAction)
+    detailMap.put("userName", userName)
+    detailMap.put("password", password)
+    detailMap.put("host", host)
+    detailMap.put("port", ftp.getPort)
+    detailMap.put("remoteFile", remoteFile)
     
-    ftpAction match {
-      case "listFiles"  => {
-        cd(remoteDir)
-        listFiles
+    try {
+      connect(host)
+      login(userName, password)
+      
+      ftpAction match {
+        case "listFiles"  => {
+          cd(remoteDir)
+          listFiles
+        }
+        case "listFileNames"  => {
+          cd(remoteDir)
+          AuditService.insertFTPFile(listFileNames, Integer.valueOf(instanceId))
+        }
+        case "downloadAllFiles"  => {
+          cd(remoteDir)
+          downloadAllFiles(localDir)
+        }
+        case "deleteFile"  => deleteFile(remote)
+        case "removeDir"  => removeDir(remote)
+        case "downloadFile"  => downloadFile(remote, local)
+        case "cd"  => cd(remoteDir)
+        case "md"  => md(remoteDir)
+        case "uploadFile"  => {
+          cd(remoteDir)
+          uploadFile(local)
+        }
       }
-      case "listFileNames"  => {
-        cd(remoteDir)
-        AuditService.insertFTPFile(listFileNames, Integer.valueOf(instanceId))
-      }
-      case "downloadAllFiles"  => {
-        cd(remoteDir)
-        downloadAllFiles(localDir)
-      }
-      case "deleteFile"  => deleteFile(remote)
-      case "removeDir"  => removeDir(remote)
-      case "downloadFile"  => downloadFile(remote, local)
-      case "cd"  => cd(remoteDir)
-      case "md"  => md(remoteDir)
-      case "uploadFile"  => {
-        cd(remoteDir)
-        uploadFile(local)
-      }
+          
+    }finally {
+      client.disconnect()      
     }
-    
-    client.disconnect()
     context
   }
   
@@ -92,8 +106,10 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
   def connected: Boolean = client.isConnected
 
   def disconnect(): Unit = {
-    client.logout()
-    client.disconnect()
+    if(connected){
+      client.logout()
+      client.disconnect()      
+    }
   }
 
   def canConnect(host: String): Boolean = {
