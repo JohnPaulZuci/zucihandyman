@@ -15,6 +15,7 @@ import in.handyman.command.CommandProxy
 import in.handyman.config.ConfigurationService
 import in.handyman.util.ParameterisationEngine
 import in.handyman.audit.AuditService
+import java.security.MessageDigest
 
 
 /**
@@ -150,6 +151,33 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     val stream = client.retrieveFileStream(remote)
     client.completePendingCommand()
     stream
+  }
+  
+  def findChecksum(digest : MessageDigest, remote: String): String = {
+    val stream = client.retrieveFileStream(remote)
+    val byteArray : Array[Byte] = new Array[Byte](1024);
+    var bytesCount : Int = 0; 
+      
+    //Read file data and update in message digest
+    bytesCount = stream.read(byteArray);
+    while (bytesCount > 0) {
+      digest.update(byteArray, 0, bytesCount)
+      bytesCount = stream.read(byteArray);
+    }
+     
+    //close the stream; We don't need it now.
+    stream.close();
+     
+    //Get the hash's bytes
+    val bytes : Array[Byte] = digest.digest();
+     
+    //This bytes[] has bytes in decimal format;
+    //Convert it to hexadecimal format
+    var sb : StringBuilder = new StringBuilder();
+    bytes.foreach(byt => sb.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1)))
+     
+    //return complete hash
+    sb.toString();
   }
 
   def downloadAllFiles(localDir: String) = {

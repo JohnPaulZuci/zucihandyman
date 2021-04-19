@@ -23,6 +23,7 @@ object CommandFactory {
       case "ftp" => new FTPAction
       case "zip" => new ZipAction
       case "unzip" => new UnzipAction
+      case "checksum" => new ChecksumAction
       case "randforestregressmodeltraining" => new RandForestRegressModelTrainingAction
       case "randforestregressmodeltesting" => new RandForestRegressModelTestingAction
       case "randforestregressmodelevaluation" => new RandForestRegressModelEvaluationAction
