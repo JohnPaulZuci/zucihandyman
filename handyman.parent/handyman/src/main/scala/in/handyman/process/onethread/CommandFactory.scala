@@ -9,8 +9,9 @@ object CommandFactory {
     name.toLowerCase match {
       case "abort" => new AbortAction
       case "transform" => new TransformAction
-      case "assign" => new FetchVariableAction
+      case "fetch" => new FetchVariableAction
       case "callprocess" => new CallProcessAction
+      case "forkprocess" => new ForkProcessAction
       case "doozle" => new DoozleAction
       case "sendemail" => new SendEMailAction
       case "execjava" => new JavaAction

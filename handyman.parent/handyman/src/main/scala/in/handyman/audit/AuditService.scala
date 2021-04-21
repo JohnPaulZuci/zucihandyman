@@ -258,5 +258,26 @@ object AuditService extends LazyLogging{
       conn.close()
     }
   }
-    
+
+  def insertBatchAudit(statementId:Int, actionName:String, instanceId:Int, rowsProcessed:Int, timeTaken:Int) {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO batch_audit (instance_id, command_name, statement_id, rows_processed, time_taken) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+    try {
+      st.setInt(1, instanceId)
+      st.setString(2, actionName)
+      st.setInt(3, statementId)
+      st.setInt(4, rowsProcessed)
+      st.setInt(5, timeTaken)
+
+      val rowsUpdated = st.executeUpdate()
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
 }

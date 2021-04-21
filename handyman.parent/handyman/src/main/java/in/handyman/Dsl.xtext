@@ -34,6 +34,7 @@ Action:
 	| WriteCsv
 	| Transform
 	| Callprocess
+	| Forkprocess
 	| Fetch
 	| Doozle
 	| Dropfile
@@ -117,13 +118,19 @@ Callprocess:
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
+	
+Forkprocess:
+	'forkprocess' 'as' name=STRING 'with-target' target=STRING 'from-file' source=STRING 'using' datasource=STRING 'for-every' 
+	'{'
+		value=SelectStatement
+	'}' 'on-condition' condition=Expression;
 
 Copydata:
-	'copydata' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'target' target=STRING 'by-batch' limit=STRING
+	'copydata' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'by-batch' limit=STRING
 	'using'
 	'{'
 	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
+	'}' 'fielding' writeThreadCount=STRING 'with-fetch-batch-size' fetchBatchSize=STRING 'with-write-batch-size' writeBatchSize=STRING 'on-condition' condition=Expression;
 
 WriteCsv:
 	'writecsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'using'
