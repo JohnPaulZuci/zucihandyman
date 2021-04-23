@@ -65,7 +65,6 @@ class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with
   @throws(classOf[Exception])
   def executeChain(actionList: org.eclipse.emf.common.util.EList[in.handyman.dsl.Action], context: Context): java.util.HashMap[String, java.util.Map[String, String]] =
     {
-
       val iterator = actionList.iterator
       val detailMap: java.util.HashMap[String, java.util.Map[String, String]] = new java.util.HashMap[String, java.util.Map[String, String]]
       while (iterator.hasNext) {
