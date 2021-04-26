@@ -101,7 +101,7 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
           batchSize = Integer.valueOf(entry.getValue.size())
           logger.info("Started Executing Forkprocess for batch-id#{} with batch-size#{}", batchNo, batchSize)
           
-          val countDownLatch: CountDownLatch = new CountDownLatch(entry.getValue.size());
+          val countDownLatch: CountDownLatch = new CountDownLatch(batchSize);
           val tryContexSet = entry.getValue;
           tryContexSet.forEach(tryContext=>{
             val runtimeContext = ProcessAST.loadProcessAST(processName, fileRelativePath, tryContext)
