@@ -117,7 +117,7 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
           countDownLatch.await();
         } catch {
           case ex: InterruptedException => {
-            ex.printStackTrace()
+            //ex.printStackTrace()
             throw ex
           }
         }
