@@ -15,12 +15,15 @@ import in.handyman.server.ProcessAST
 import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
+import org.slf4j.MarkerFactory
 
 
 class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
 
   val detailMap: java.util.Map[String, String] = new java.util.HashMap[String, String]
   val executor: ExecutorService = Executors.newCachedThreadPool();
+  val auditMarker = "FORKPROCESS";
+  val aMarker = MarkerFactory.getMarker(auditMarker);
 
   def execute(context: Context, action: in.handyman.dsl.Action, actionId: Integer): Context = {
     val callProcessAsIs: in.handyman.dsl.Forkprocess = action.asInstanceOf[in.handyman.dsl.Forkprocess]
@@ -57,7 +60,9 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
         val key = rs.getMetaData.getColumnLabel(i)
         val value = rs.getString(i)
         tryContext.addValue(key, value)
-        detailMap.put("query.output." + key, value)
+        
+        val queryOutputKey : String = "query.output.rowId=" + rs.getRow + ".columnName=" + key
+        detailMap.put(queryOutputKey, value)
       }
       contextSet.add(tryContext)
       threadCount.incrementAndGet
@@ -94,20 +99,20 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
     
     var batchSize : Integer = 0;
     var batchNo : Integer = 0;
-    try{
-        val entrySet : java.util.Set[Entry[Integer, java.util.Set[TryContext]]] = forkBatchMap.entrySet();
-        entrySet.forEach(entry => {
-          batchNo = entry.getKey
-          batchSize = Integer.valueOf(entry.getValue.size())
-          logger.info("Started Executing Forkprocess for batch-id#{} with batch-size#{}", batchNo, batchSize)
-          
-          val countDownLatch: CountDownLatch = new CountDownLatch(batchSize);
-          val tryContexSet = entry.getValue;
-          tryContexSet.forEach(tryContext=>{
-            val runtimeContext = ProcessAST.loadProcessAST(processName, fileRelativePath, tryContext)
-            val processWorker  = new ForkProcessCallable(runtimeContext, countDownLatch);
-            this.executor.submit(processWorker)
+    val entrySet : java.util.Set[Entry[Integer, java.util.Set[TryContext]]] = forkBatchMap.entrySet();
+    entrySet.forEach(entry => {
+      batchNo = entry.getKey
+      batchSize = Integer.valueOf(entry.getValue.size())
+      logger.info("Started Executing Forkprocess for batch-id#{} with batch-size#{}", batchNo, batchSize)
+      try{
+        val countDownLatch: CountDownLatch = new CountDownLatch(batchSize);
+        val tryContexSet = entry.getValue;
+        tryContexSet.forEach(tryContext=>{
+          val runtimeContext = ProcessAST.loadProcessAST(processName, fileRelativePath, tryContext)
+          val processWorker  = new ForkProcessCallable(runtimeContext, countDownLatch);
+          this.executor.submit(processWorker)
         })
+        
         try {
           countDownLatch.await();
         } catch {
@@ -116,16 +121,17 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
             throw ex
           }
         }
-  
+
         logger.info("Completed Executing Forkprocess for batch-id#{} with batch-size#{}", batchNo, batchSize)
-      })
-    }catch {
-      case ex: Throwable => {
-        logger.info("Caught Exception While Executing Forkprocess for batch-id#{} with batch-size#{}", batchNo, batchSize)
-        handleError(ex)
-        detailMap.put("exception", ExceptionUtil.completeStackTraceex(ex))
+    
+      }catch {
+        case ex: Throwable => {
+          logger.error(aMarker, "Caught Exception#{} While Executing Forkprocess for batch-Id#{} with Batch-Size#{}", ex, batchNo, batchSize)
+          val excepMsg : String = "Exception on Batch-Id " + batchNo + " With Batch-Size : " + batchSize
+          detailMap.put(excepMsg, ExceptionUtil.completeStackTraceex(ex))
+        }
       }
-    }
+    })
       
     context
   }
