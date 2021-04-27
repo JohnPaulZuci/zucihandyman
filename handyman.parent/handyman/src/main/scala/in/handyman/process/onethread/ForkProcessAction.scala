@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
+import org.slf4j.MarkerFactory
+
 import com.typesafe.scalalogging.LazyLogging
 
 import in.handyman.command.CommandProxy
@@ -15,7 +17,6 @@ import in.handyman.server.ProcessAST
 import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
-import org.slf4j.MarkerFactory
 
 
 class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
