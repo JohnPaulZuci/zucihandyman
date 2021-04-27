@@ -1,24 +1,26 @@
 package in.handyman.process.onethread
 
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Callable
-import com.typesafe.scalalogging.LazyLogging
-import net.sf.jsqlparser.statement.insert.Insert
-import scala.collection.mutable.HashSet
-import in.handyman.util.ResourceAccess
-import in.handyman.HandymanException
-import scala.util.control.Breaks
 import java.sql.SQLException
 import java.sql.Statement
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.Callable
+import java.util.concurrent.CountDownLatch
+
+import scala.util.control.Breaks
+
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.HandymanException
+import in.handyman.util.ResourceAccess
+import net.sf.jsqlparser.statement.insert.Insert
+import java.util.ArrayList
 
 class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonPill: Row,
                          copyData: in.handyman.dsl.Copydata,
                          id:       String, rowQueue: BlockingQueue[Row],
                          countDownLatch: CountDownLatch) extends Callable[Void] with LazyLogging {
 
-  val writeBuffer: HashSet[String] = new HashSet[String]
+  val writeBuffer: ArrayList[String] = new ArrayList[String]
   val target = {
     if (!copyData.getTo.trim.isEmpty())
       copyData.getTo.trim
@@ -52,7 +54,7 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
     })
     colListBuilder.toString
   }
-
+  
   def call(): Void = {
 
     Breaks.breakable {
@@ -60,7 +62,8 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
         val row = rowQueue.take();
         if (poisonPill.equals(row)) {
           if (!writeBuffer.isEmpty) {
-            logger.info(s"CopydataWriter(After poison pill) flushing to database rows:$writeBuffer.size")
+            val wriBuffSize = writeBuffer.size.toString()
+            logger.info(s"CopydataWriter(After poison pill) flushing to database rows:$wriBuffSize")
             writeToDb
           }
           countDownLatch.countDown
@@ -70,7 +73,8 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
           val dataFrame = generateDataFrame(row)
           writeBuffer.add(dataFrame)
           if (writeBuffer.size % writeSize == 0) {
-            logger.info(s"CopydataWriter(Before poison pill) flushing to database rows:$writeBuffer.size")
+            val wriBuffSize = writeBuffer.size.toString()
+            logger.info(s"CopydataWriter(Before poison pill) flushing to database rows:$wriBuffSize")
             writeToDb
           }
         }
@@ -113,7 +117,7 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
     logger.info(s"Writing to database using conn:$target")
     val stmt: Statement = conn.createStatement
     try {
-      writeBuffer.foreach(sql => {
+      writeBuffer.forEach(sql => {
         stmt.addBatch(sql)
       })
       stmt.executeBatch
