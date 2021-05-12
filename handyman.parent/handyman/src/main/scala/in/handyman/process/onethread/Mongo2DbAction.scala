@@ -128,6 +128,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
             }
             logger.info("Mongodbsql (Nqne) id#{}, name#{}, from#{}, rows#{}", id, name, source, rowsProcessed.toString)
 
+            //System.out.println(insert)
             mongo2DbStmtto.execute(insert)
 
             mongo2DbDbConnto.commit()
@@ -284,7 +285,9 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       } else if ((colVal.isInstanceOf[java.util.ArrayList[_]])) {
         val colValObj = colVal.asInstanceOf[java.util.ArrayList[_]]
         if (colValObj != null && !colValObj.isEmpty()) {
-          colValStr = colValObj.get(0).toString()
+          /*colValStr = ""
+          colValObj.forEach(colValO => colValStr = colValStr + colValO.toString() + "|")
+          queryAppend = queryAppend + "\'" + colValStr.substring(0, colValStr.length()-1) + "\'" + ","*/
           queryAppend = queryAppend + "\'" + colValStr + "\'" + ","
         } else {
           queryAppend = queryAppend + null + ","
