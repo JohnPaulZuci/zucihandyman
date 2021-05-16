@@ -1,12 +1,14 @@
 package in.handyman.audit
 
-import in.handyman.config.ConfigurationService
-import java.sql.DriverManager
 import java.sql.Statement
-import in.handyman.util.ResourceAccess
-import com.typesafe.scalalogging.LazyLogging
-import org.slf4j.MarkerFactory
+
 import org.json.JSONObject
+import org.slf4j.MarkerFactory
+
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.config.ConfigurationService
+import in.handyman.util.ResourceAccess
 
 object AuditService extends LazyLogging{
 
@@ -197,7 +199,7 @@ object AuditService extends LazyLogging{
     }
   }
   
-    def insertModelTestingResponse(response: String) = {
+  def insertModelTestingResponse(response: String) = {
     val conn = ResourceAccess.rdbmsConn(auditService)
     conn.setAutoCommit(false)
     //logger.info(aMarker, "Obtained Connection for handle ={} for inserting the audit for process {}", auditService, instanceName)
@@ -231,5 +233,51 @@ object AuditService extends LazyLogging{
       conn.close()
     }
   }
-    
+  
+  def insertFTPFile(ftpFiles: Array[String], processId : Int) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO ftp_file (process_id, file_path, created_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+      ftpFiles.foreach(fFile => {
+        st.setInt(1, processId)
+        st.setString(2, fFile)        
+        
+        st.addBatch()
+      })
+      
+      val rowsUpdated = st.executeBatch()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+
+  def insertBatchAudit(statementId:Int, actionName:String, instanceId:Int, rowsProcessed:Int, timeTaken:Int) {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO batch_audit (instance_id, command_name, statement_id, rows_processed, time_taken) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+    try {
+      st.setInt(1, instanceId)
+      st.setString(2, actionName)
+      st.setInt(3, statementId)
+      st.setInt(4, rowsProcessed)
+      st.setInt(5, timeTaken)
+
+      val rowsUpdated = st.executeUpdate()
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
 }

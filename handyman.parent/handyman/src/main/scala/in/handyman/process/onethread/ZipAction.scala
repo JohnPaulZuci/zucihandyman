@@ -76,7 +76,6 @@ class ZipAction extends in.handyman.command.Action with LazyLogging {
           detailMap.put("sql", sqlItem)
       })
     } finally {
-
       stmt.close
       conn.close
     }
