@@ -34,10 +34,17 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
     val sqlList = loadcsv.getValue.replaceAll("\"", "")
     val delim = loadcsv.getDelim
     var limit = loadcsv.getLimit.toInt
+    var fileName = ""
+    if (csvFile.contains("\\")) {
+      val counter: Int = csvFile.length - csvFile.replaceAll("\\", "").length
+      val file: Array[String] = csvFile.split("\\", counter + 1)
+      fileName = file(counter)
+    }else {
+      val counter: Int = csvFile.length - csvFile.replaceAll("\\/", "").length
+      val file: Array[String] = csvFile.split("/", counter + 1)
+      fileName = file(counter)
+    }
 
-    val counter: Int = csvFile.length - csvFile.replaceAll("\\/", "").length
-    val file: Array[String] = csvFile.split("/", counter + 1)
-    val fileName: String = file(counter)
     var count: Int = 0
     var st: Statement = null
     var totalcount: Int = 0
