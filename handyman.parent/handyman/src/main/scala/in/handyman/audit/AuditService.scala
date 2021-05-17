@@ -280,4 +280,25 @@ object AuditService extends LazyLogging{
       conn.close()
     }
   }
+  
+  def insertJsonTransform(jsonStr: String, processId : Int) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO json_transform_detail (process_id, json, created_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+        st.setInt(1, processId)
+        st.setString(2, jsonStr)        
+        
+        val rowsUpdated = st.executeUpdate()
+      
+        conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
 }

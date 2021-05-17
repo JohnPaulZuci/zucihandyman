@@ -60,6 +60,8 @@ Action:
 	| Unzip
 	| Zip
 	| Checksum
+	| JsonTransform
+	| CallRestApi
 	);
 	
 RestPart:
@@ -281,6 +283,18 @@ Checksum:
 	'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file' remoteFile=STRING 'using' 
 	'{'
 	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+JsonTransform:
+	'jsontransform' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'target-table' targetTable=STRING 'using'
+	'{'
+		value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+	
+CallRestApi:
+	'callrestapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'using'
+	'{'
+		value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
 Column:
