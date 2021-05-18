@@ -22,6 +22,7 @@ local.properties
 generated/
 src-gen/
 xtend-gen/
+xtext-gen/
 */src/main/xtext-gen
 */src/main/xtext-gen
 *.cache-tests
