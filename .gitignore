@@ -23,8 +23,12 @@ generated/
 src-gen/
 xtend-gen/
 xtext-gen/
-*/src/main/xtext-gen
-*/src/main/xtext-gen
+*/src/main/xtext-gen/*
+*/src/main/xtext-gen/*
+./handyman.parent/handyman.ide/src/main/xtext-gen/*
+/handyman.parent/handyman.ide/src/main/xtext-gen/*
+./handyman.parent/handyman/model/*
+/handyman.parent/handyman/model/*
 *.cache-tests
 
 # Ignore plugin.xml_gen and feature.xml_gen files, when build Eclipse Plugins.
