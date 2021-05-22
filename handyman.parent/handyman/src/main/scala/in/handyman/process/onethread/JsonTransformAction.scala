@@ -2,6 +2,7 @@ package in.handyman.process.onethread
 
 import java.sql.SQLException
 import java.sql.SQLSyntaxErrorException
+import java.sql.Statement
 
 import org.json.JSONObject
 import org.slf4j.MarkerFactory
@@ -21,19 +22,17 @@ class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
   val auditMarker = "JSONTRANSFORM";
   val aMarker = MarkerFactory.getMarker(auditMarker);
 
-  def execute(context: Context, action: Action, actionId:Integer): Context = {
+  def execute(context: Context, action: Action, actionId: Integer): Context = {
     val jsonTransformAsIs = action.asInstanceOf[in.handyman.dsl.JsonTransform]
     val jsonTransform: in.handyman.dsl.JsonTransform = CommandProxy.createProxy(jsonTransformAsIs, classOf[in.handyman.dsl.JsonTransform], context)
 
     val dbSrc = jsonTransform.getSource
-    val dbTarget = jsonTransform.getTo
     val name = jsonTransform.getName
     val targetTable = jsonTransform.getTargetTable
     val id = context.getValue("process-id")
     val sql = jsonTransform.getValue.replaceAll("\"", "")
     logger.info(aMarker, "Transform Json id#{}, name#{}, dbSrc#{}, sqlList#{}", id, name, dbSrc)
     detailMap.put("dbSrc", dbSrc)
-    detailMap.put("dbTarget", dbTarget)
     detailMap.put("targetTable", targetTable)
 
     val conn = ResourceAccess.rdbmsConn(dbSrc)
@@ -41,43 +40,47 @@ class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
 
     val stmt = conn.createStatement
     try {
-        if (!sql.trim.isEmpty()) {
-          logger.info(aMarker, "Transform Json id#{}, executing script {}", id, sql.trim)
-          try {
-            val rs = stmt.executeQuery(sql.trim)
-            val columnCount = rs.getMetaData.getColumnCount
-            val rsMetaData = rs.getMetaData
-            
-            val jsonObject : JSONObject = new JSONObject()
-  
-            while (rs.next()) {
-              for (i <- 1 to columnCount) {
-                jsonObject.put(rsMetaData.getColumnLabel(i), rs.getObject(i))
-              }
-            }
-            
-            AuditService.insertJsonTransform(jsonObject.toString(), Integer.valueOf(id))
-          } catch {
-            
-            case ex:SQLSyntaxErrorException=>{
-              logger.error(aMarker, "Stopping execution, General Error executing sql for {} with for campaign {}", sql, ex)
-              detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
-              throw ex
-            }
-            
-            case ex: SQLException => {
-              logger.error(aMarker, "Continuing to execute, even though SQL Error executing sql for {} ", sql, ex)
-              detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
-              
-            }
-            
-            case ex: Throwable => {
-              logger.error(aMarker, "Stopping execution, General Error iexecuting sql for {} with for campaign {}", sql, ex)
-              detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
-              throw ex
+      if (!sql.trim.isEmpty()) {
+        logger.info(aMarker, "Transform Json id#{}, executing script {}", id, sql.trim)
+        try {
+          val rs = stmt.executeQuery(sql.trim)
+          val columnCount = rs.getMetaData.getColumnCount
+          val rsMetaData = rs.getMetaData
+
+          val jsonObject: JSONObject = new JSONObject()
+
+          while (rs.next()) {
+            for (i <- 1 to columnCount) {
+              jsonObject.put(rsMetaData.getColumnLabel(i), rs.getObject(i))
             }
           }
+          val st = conn.prepareStatement("INSERT INTO " + targetTable + "(process_id, json, updated_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+          st.setInt(1, Integer.valueOf(id))
+          st.setString(2, jsonObject.toString())
+          val rowsUpdated = st.executeUpdate()
+
+          conn.commit
+        } catch {
+
+          case ex: SQLSyntaxErrorException => {
+            logger.error(aMarker, "Stopping execution, General Error executing sql for {} with for campaign {}", sql, ex)
+            detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
+            throw ex
+          }
+
+          case ex: SQLException => {
+            logger.error(aMarker, "Continuing to execute, even though SQL Error executing sql for {} ", sql, ex)
+            detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
+
+          }
+
+          case ex: Throwable => {
+            logger.error(aMarker, "Stopping execution, General Error iexecuting sql for {} with for campaign {}", sql, ex)
+            detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
+            throw ex
+          }
         }
+      }
       conn.commit
       logger.info(aMarker, "Completed Transform Json id#{}, name#{}, dbSrc#{}, sql#{}", id, name, dbSrc, sql)
     } finally {
@@ -92,7 +95,6 @@ class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
     val jsonTransformAsIs = action.asInstanceOf[in.handyman.dsl.JsonTransform]
     val jsonTransform: in.handyman.dsl.JsonTransform = CommandProxy.createProxy(jsonTransformAsIs, classOf[in.handyman.dsl.JsonTransform], context)
     val dbSrc = jsonTransform.getSource
-    val dbTarget = jsonTransform.getTo
     val name = jsonTransform.getName
     val id = context.getValue("process-id")
     val expression = jsonTransform.getCondition

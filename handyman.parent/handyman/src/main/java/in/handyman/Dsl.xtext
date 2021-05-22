@@ -286,7 +286,7 @@ Checksum:
 	'}' 'on-condition' condition=Expression;
 	
 JsonTransform:
-	'jsontransform' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'target-table' targetTable=STRING 'using'
+	'jsontransform' 'as' name=STRING 'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 		value=SelectStatement
 	'}' 'on-condition' condition=Expression;
