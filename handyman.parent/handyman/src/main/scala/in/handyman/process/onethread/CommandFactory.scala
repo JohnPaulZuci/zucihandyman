@@ -39,6 +39,7 @@ object CommandFactory {
       case "gradboostclassifymodelevaluation" => new GradBoostClassifyModelEvaluationAction
       case "jsontransform" => new JsonTransformAction
       case "callrestapi" => new RestApiAction
+      case "python" => new PythonAction
     }
   }
 }
