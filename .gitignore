@@ -12,6 +12,8 @@ tmp/
 local.properties
 .settings/
 .loadpath
+*.classpath
+.classpath
 .recommenders
 
 # End of https://www.gitignore.io/api/maven,vaadin,eclipse
