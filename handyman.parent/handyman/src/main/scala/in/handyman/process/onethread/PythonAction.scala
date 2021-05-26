@@ -32,7 +32,7 @@ class PythonAction extends in.handyman.command.Action with LazyLogging {
 
     val name = python.getName
     val id = context.getValue("process-id")
-    val sql = python.getValue
+    val sql = python.getValue.replaceAll("\"", "")
     val target = python.getTarget
 
     val dbSrc = {
@@ -68,11 +68,11 @@ class PythonAction extends in.handyman.command.Action with LazyLogging {
       var line: String = null
       val stackTrace: ArrayList[String] = new ArrayList[String]()
       while (({ line = br.readLine(); line != null }))
-        stackTrace.add(line)
-      logger.info(aMarker, "Completed Python id#{}, name#{}, dbSrc#{}, sql#{}, table#{}", id, name, dbSrc, target)
+        stackTrace.add(line.replaceAll("\"", "'"))
+      val query = "insert into " + target + " (process_id,stack_trace) values (" + id + ",\"" + stackTrace + "\")"
+      stmt.executeUpdate(query)
       conn.commit
-      val query = "inset into " + target + " (process_id,stack_trace) values (" + id + "," + stackTrace + ")"
-      stmt.executeQuery(query)
+      logger.info(aMarker, "Completed Python id#{}, name#{}, dbSrc#{}, sql#{}, table#{}", id, name, dbSrc, target)
     
     } catch {
       case t: Throwable => t.printStackTrace()
