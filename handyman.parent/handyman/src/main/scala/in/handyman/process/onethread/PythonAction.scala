@@ -59,6 +59,7 @@ class PythonAction extends in.handyman.command.Action with LazyLogging {
           params.add(rs.getString(i));
         }
       }
+      params.add(id)
       val param = params_assembler(params)
       val rt: Runtime = Runtime.getRuntime
       val proc: Process = rt.exec(param)
