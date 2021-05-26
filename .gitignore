@@ -12,10 +12,7 @@ tmp/
 local.properties
 .settings/
 .loadpath
-*.classpath
-.classpath
 .recommenders
-handyman.parent/handyman/.classpath
 
 # End of https://www.gitignore.io/api/maven,vaadin,eclipse
 /target/
