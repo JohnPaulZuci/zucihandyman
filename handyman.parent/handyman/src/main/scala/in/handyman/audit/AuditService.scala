@@ -1,11 +1,14 @@
 package in.handyman.audit
 
-import in.handyman.config.ConfigurationService
-import java.sql.DriverManager
 import java.sql.Statement
-import in.handyman.util.ResourceAccess
-import com.typesafe.scalalogging.LazyLogging
+
+import org.json.JSONObject
 import org.slf4j.MarkerFactory
+
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.config.ConfigurationService
+import in.handyman.util.ResourceAccess
 
 object AuditService extends LazyLogging{
 
@@ -157,6 +160,142 @@ object AuditService extends LazyLogging{
     } catch {
       case t: Throwable =>
         t.printStackTrace()
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+  
+  def insertModelResponse(response: String) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    //logger.info(aMarker, "Obtained Connection for handle ={} for inserting the audit for process {}", auditService, instanceName)
+    val st = conn.prepareStatement("INSERT INTO model_response (sigma_id, template_name, pipeline_name, process_id, model_type, created_date) VALUES (?, ?, ?, ?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+      val jsonObj: JSONObject = new JSONObject(response);
+
+      val sigmaId: String = String.valueOf(jsonObj.get("sigma-id"))
+      val templateName: String = String.valueOf(jsonObj.get("template-name"))
+      val pipelineName: String = String.valueOf(jsonObj.get("pipeline-name"))
+      val processId: String = String.valueOf(jsonObj.get("process-id"))
+      val modelType: String = String.valueOf(jsonObj.get("model-type"))
+      
+      st.setString(1, sigmaId)
+      st.setString(2, templateName)
+      st.setString(3, pipelineName)
+      st.setString(4, processId)
+      st.setString(5, modelType)
+      
+      val rowsUpdated = st.executeUpdate()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+  
+  def insertModelTestingResponse(response: String) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    //logger.info(aMarker, "Obtained Connection for handle ={} for inserting the audit for process {}", auditService, instanceName)
+    val st = conn.prepareStatement("INSERT INTO model_testing_response (customer_goodness, principal_amount, interest_rate, waive_off_processing_fee, process_id, model_type, created_date) VALUES (?, ?, ?, ?, ?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+      val jsonObj: JSONObject = new JSONObject(response);
+
+      val custGoodness: String = String.valueOf(jsonObj.get("customer-goodness"))
+      val principalAmount: String = String.valueOf(jsonObj.get("principal-amount"))
+      val intRate: String = String.valueOf(jsonObj.get("interest-rate"))
+      val waiveOffProcessingFee: String = String.valueOf(jsonObj.get("waive-off-processing-fee"))
+      val processId: String = String.valueOf(jsonObj.get("process-id"))
+      val modelType: String = String.valueOf(jsonObj.get("model-type"))
+      
+      st.setString(1, custGoodness)
+      st.setString(2, principalAmount)
+      st.setString(3, intRate)
+      st.setString(4, waiveOffProcessingFee)
+      st.setString(5, processId)
+      st.setString(6, modelType)
+      
+      val rowsUpdated = st.executeUpdate()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+  
+  def insertFTPFile(ftpFiles: Array[String], processId : Int) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO ftp_file (process_id, file_path, created_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+      ftpFiles.foreach(fFile => {
+        st.setInt(1, processId)
+        st.setString(2, fFile)        
+        
+        st.addBatch()
+      })
+      
+      val rowsUpdated = st.executeBatch()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+
+  def insertBatchAudit(statementId:Int, actionName:String, instanceId:Int, rowsProcessed:Int, timeTaken:Int) {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO batch_audit (instance_id, command_name, statement_id, rows_processed, time_taken) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+    try {
+      st.setInt(1, instanceId)
+      st.setString(2, actionName)
+      st.setInt(3, statementId)
+      st.setInt(4, rowsProcessed)
+      st.setInt(5, timeTaken)
+
+      val rowsUpdated = st.executeUpdate()
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+  
+  def insertJsonTransform(jsonStr: String, processId : Int) = {
+    val conn = ResourceAccess.rdbmsConn(auditService)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO json_transform_detail (process_id, json, created_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    try {
+        st.setInt(1, processId)
+        st.setString(2, jsonStr)        
+        
+        val rowsUpdated = st.executeUpdate()
+      
+        conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
     } finally {
       st.close();
       conn.close()

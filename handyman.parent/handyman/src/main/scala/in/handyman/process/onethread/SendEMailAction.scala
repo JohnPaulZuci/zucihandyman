@@ -1,16 +1,24 @@
 package in.handyman.process.onethread
 
 import java.sql.SQLException
+import java.sql.SQLSyntaxErrorException
+import java.sql.Statement
+import java.text.SimpleDateFormat
+import java.util.ArrayList
 import java.util.Date
+import java.util.Objects
 import java.util.Properties
 
 import org.slf4j.MarkerFactory
 
 import com.typesafe.scalalogging.LazyLogging
 
+import in.handyman.audit.AuditService
 import in.handyman.command.CommandProxy
 import in.handyman.command.Context
+import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
+import in.handyman.util.ResourceAccess
 import javax.mail.Address
 import javax.mail.Authenticator
 import javax.mail.Message
@@ -19,14 +27,6 @@ import javax.mail.Session
 import javax.mail.Transport
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
-import in.handyman.util.ResourceAccess
-import java.sql.Statement
-import java.util.ArrayList
-import java.text.SimpleDateFormat
-import in.handyman.audit.AuditService
-import java.sql.SQLSyntaxErrorException
-import in.handyman.util.ExceptionUtil
-import java.util.Objects
 
 class SendEMailAction extends in.handyman.command.Action with LazyLogging {
 
