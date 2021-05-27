@@ -58,7 +58,7 @@ class RestApiAction extends in.handyman.command.Action with LazyLogging {
   
           var output : String = null;
           System.out.println("Output from Server .... \n");
-          while ((output = br.readLine()) != null) {
+          while (({ output = br.readLine(); output != null })) {
               System.out.println(output);
           }
   
@@ -109,7 +109,7 @@ class RestApiAction extends in.handyman.command.Action with LazyLogging {
 
         var output : String = "";
         System.out.println("Output from Server .... \n");
-        while ((output = br.readLine()) != null) {
+        while (({ output = br.readLine(); output != null })) {
             System.out.println(output);
         }
 

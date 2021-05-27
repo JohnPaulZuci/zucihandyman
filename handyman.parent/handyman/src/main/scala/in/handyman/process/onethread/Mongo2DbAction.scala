@@ -325,7 +325,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       val dbColForm = dbCol.substring(0, dbCol.indexOf("."))
       val dbColFunc = dbCol.substring(dbCol.indexOf(".") + 1, dbCol.length())
       val obje: Object = docObj.get(dbColForm)
-      if (obje.isInstanceOf[java.util.ArrayList[Document]]) {
+      if (obje.isInstanceOf[java.util.ArrayList[Document]@unchecked]) {
         val obje1 = obje.asInstanceOf[java.util.ArrayList[Document]]
         if(obje1!=null && !obje1.isEmpty())
         return obje1.get(0)
