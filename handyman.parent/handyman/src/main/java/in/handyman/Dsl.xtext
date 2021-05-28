@@ -142,9 +142,7 @@ WriteCsv:
 	'}' 'on-condition' condition=Expression;
 
 LoadCsv:
-	'loadcsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'by-batch' limit=STRING
-	'dbschema'
-	dbschema=STRING 'using'
+	'loadcsv' 'as' name=STRING 'pid' pid=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'by-batch' limit=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
