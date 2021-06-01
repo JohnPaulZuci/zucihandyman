@@ -234,14 +234,14 @@ object AuditService extends LazyLogging{
     }
   }
   
-  def insertFTPFile(ftpFiles: Array[String], processId : Int) = {
-    val conn = ResourceAccess.rdbmsConn(auditService)
+  def insertFTPDetail(ftpFiles: Array[String], processId : Int, db: String, auditTable: String, remoteDir: String) = {
+    val conn = ResourceAccess.rdbmsConn(db)
     conn.setAutoCommit(false)
-    val st = conn.prepareStatement("INSERT INTO ftp_file (process_id, file_path, created_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
+    val st = conn.prepareStatement("INSERT INTO " + auditTable + " (process_id, file_path, updated_date) VALUES (?, ?, NOW());")
     try {
       ftpFiles.foreach(fFile => {
         st.setInt(1, processId)
-        st.setString(2, fFile)        
+        st.setString(2, remoteDir + fFile)        
         
         st.addBatch()
       })

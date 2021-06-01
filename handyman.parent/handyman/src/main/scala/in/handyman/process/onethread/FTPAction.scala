@@ -4,6 +4,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.security.MessageDigest
 import java.util.ArrayList
 
 import org.apache.commons.net.ftp.FTPClient
@@ -11,11 +12,10 @@ import org.apache.commons.net.ftp.FTPFile
 
 import com.typesafe.scalalogging.LazyLogging
 
+import in.handyman.audit.AuditService
 import in.handyman.command.CommandProxy
 import in.handyman.config.ConfigurationService
 import in.handyman.util.ParameterisationEngine
-import in.handyman.audit.AuditService
-import java.security.MessageDigest
 
 
 /**
@@ -50,6 +50,8 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     val remoteFile = ftp.getRemoteFile
     val remote = remoteDir.concat(remoteFile)
     val local = localDir.concat(localFile)
+    val dbSrc = ftp.getSource
+    val targetTable = ftp.getTargetTable
     
     detailMap.put("name", name)
     detailMap.put("localDir", localDir)
@@ -61,6 +63,8 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     detailMap.put("host", host)
     detailMap.put("port", ftp.getPort)
     detailMap.put("remoteFile", remoteFile)
+    detailMap.put("dbSrc", dbSrc)
+    detailMap.put("targetTable", targetTable)
     
     try {
       connect(host)
@@ -73,25 +77,54 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
         }
         case "listFileNames"  => {
           cd(remoteDir)
-          AuditService.insertFTPFile(listFileNames, Integer.valueOf(instanceId))
         }
-        case "downloadAllFiles"  => {
-          cd(remoteDir)
-          downloadAllFiles(localDir)
+        case "downloadFile"  => {
+          if(remoteFile != null && !remoteFile.isEmpty()){
+            downloadFile(remote, localDir.concat(remoteFile))
+            
+            var fileList : Array[String] = new Array[String](1);
+            fileList(0) = remoteFile
+            AuditService.insertFTPDetail(fileList, Integer.valueOf(instanceId), dbSrc, targetTable, remoteDir)
+          }else{
+            cd(remoteDir)
+            downloadAllFiles(localDir)
+            
+            AuditService.insertFTPDetail(listFileNames, Integer.valueOf(instanceId), dbSrc, targetTable, remoteDir)
+          }
         }
         case "deleteFile"  => deleteFile(remote)
         case "removeDir"  => removeDir(remote)
-        case "downloadFile"  => downloadFile(remote, local)
         case "cd"  => cd(remoteDir)
         case "md"  => md(remoteDir)
         case "uploadFile"  => {
           cd(remoteDir)
-          uploadFile(local)
+          
+          if(localFile != null && !localFile.isEmpty()){
+            uploadFile(local)
+            
+            var fileList : Array[String] = new Array[String](1);
+            fileList(0) = localFile
+            AuditService.insertFTPDetail(fileList, Integer.valueOf(instanceId), dbSrc, targetTable, remoteDir)
+          }else{
+            val localDirFile : File = new File(localDir);
+            val localFiles : Array[File] = localDirFile.listFiles();
+            var localFileNames : Array[String] = new Array[String](localFiles.size);
+      
+            var i : Int = 0; 
+            localFiles.foreach(lFile => {
+              if(lFile.isFile())
+                uploadFile(localDir.concat(lFile.getName))
+                localFileNames(i) = lFile.getName;
+                i = i + 1
+            })
+            
+            AuditService.insertFTPDetail(localFileNames, Integer.valueOf(instanceId), dbSrc, targetTable, remoteDir)
+          }
         }
       }
           
     }finally {
-      client.disconnect()      
+      client.disconnect()   
     }
     context
   }

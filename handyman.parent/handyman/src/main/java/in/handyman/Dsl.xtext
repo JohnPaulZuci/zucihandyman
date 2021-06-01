@@ -169,9 +169,8 @@ Mongo2Db:
 
 FTP:
 	'ftp' 'as' name=STRING 'host' host=STRING 'port' port=STRING 'username' username=STRING 'password' password=STRING
-	'action' action=STRING
-	'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file'
-	remoteFile=STRING 'using'
+	'action' action=STRING 'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file'
+	remoteFile=STRING 'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=STRING
 	'}' 'on-condition' condition=Expression;
