@@ -51,7 +51,8 @@ Action:
 	| JsonTransform
 	| RestApi
 	| Python
-	| Rest);
+	| Rest
+	);
 
 SendEMail:
 	'sendemail' 'as' name=STRING 'db' source=STRING 'smtp-host' smtphost=STRING 'smtp-port' smtpport=STRING
@@ -128,7 +129,8 @@ WriteCsv:
 	'}' 'on-condition' condition=Expression;
 
 LoadCsv:
-	'loadcsv' 'as' name=STRING 'pid' pid=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'by-batch' limit=STRING 'using'
+	'loadcsv' 'as' name=STRING 'pid' pid=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'by-batch'
+	limit=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
@@ -153,7 +155,8 @@ Mongo2Db:
 
 FTP:
 	'ftp' 'as' name=STRING 'host' host=STRING 'port' port=STRING 'username' username=STRING 'password' password=STRING
-	'action' action=STRING 'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file'
+	'action' action=STRING 'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING
+	'remote-file'
 	remoteFile=STRING 'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=STRING
@@ -188,7 +191,8 @@ JsonTransform:
 	'}' 'on-condition' condition=Expression;
 
 RestApi:
-	'restapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'payload' payload=STRING 
+	'restapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'payload'
+	payload=STRING
 	'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=SelectStatement
@@ -199,28 +203,30 @@ Python:
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
-	
+
 Rest:
 	'rest' 'as' name=STRING 'secured-by' authtoken=STRING 'with-url' url=STRING 'and-method-as' method=STRING
-	'with-authentication-type' authenticationType=STRING
 	'{'
-	'from' resourcedatafrom=STRING 'update-url-with' '{'
-	urldata=SelectStatement
-	'}'
-	'from' headerdatafrom=STRING 'update-header-with' '{'
-	headerdata=SelectStatement
-	'}'
-	'from' postdatafrom=STRING 'update-body-with' '{'
-	'parent' 'as' parentName=STRING parentdata=SelectStatement
-	parts+=(RestPart)*
-	'}'
-	'into' ackdatato=STRING 'store-ack-at' '{'
-	ackdata=SelectStatement
-	'}'
-	'}' 'on-condition' condition=Expression;
+		'from' resourcedatafrom=STRING 'update-url-with' '{'
+				urldata=SelectStatement
+		'}'
+		'from' headerdatafrom=STRING 'update-header-with' '{'
+				headerdata=SelectStatement  
+			'}'
+		'from' postdatafrom=STRING 'update-body-with' '{'
+				'parent' 'as' parentName=STRING parentdata=SelectStatement 
+				parts+=(RestPart)*
+		'}'
+		'into' ackdatato=STRING 'store-ack-at' '{'
+				ackdata=SelectStatement 
+		'}'
+	'}' 'on-condition' condition=Expression
+;
 
 RestPart:
-	'part' 'as' partName=STRING 'with' partData=SelectStatement;
+	'part' 'as' partName=STRING 'with' partData=SelectStatement
+; 
+
 
 Column:
 	STRING;
