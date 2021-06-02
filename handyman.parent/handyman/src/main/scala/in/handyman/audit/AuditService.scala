@@ -259,6 +259,26 @@ object AuditService extends LazyLogging{
     }
   }
 
+  def insertRestApiResponse(response: String, processId : Int, auditTable: String, db: String) = {
+    val conn = ResourceAccess.rdbmsConn(db)
+    conn.setAutoCommit(false)
+    val st = conn.prepareStatement("INSERT INTO " + auditTable + " (process_id, response, updated_date) VALUES (?, ?, NOW());")
+    try {
+      st.setInt(1, processId)
+      st.setString(2, response)
+      st.executeUpdate()
+      
+      conn.commit
+    } catch {
+      case t: Throwable =>
+        t.printStackTrace()
+        0
+    } finally {
+      st.close();
+      conn.close()
+    }
+  }
+    
   def insertBatchAudit(statementId:Int, actionName:String, instanceId:Int, rowsProcessed:Int, timeTaken:Int) {
     val conn = ResourceAccess.rdbmsConn(auditService)
     conn.setAutoCommit(false)

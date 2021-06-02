@@ -300,7 +300,8 @@ JsonTransform:
 	'}' 'on-condition' condition=Expression;
 
 CallRestApi:
-	'callrestapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'using'
+	'callrestapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'input' input=STRING 
+	'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;

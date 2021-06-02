@@ -1,17 +1,17 @@
 package in.handyman.process.onethread
 
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStream
-import java.net.HttpURLConnection
 import java.net.MalformedURLException
-import java.net.URL
 
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.HttpClients
 import org.slf4j.MarkerFactory
 
 import com.typesafe.scalalogging.LazyLogging
 
+import in.handyman.audit.AuditService
 import in.handyman.command.CommandProxy
 import in.handyman.command.Context
 import in.handyman.dsl.Action
@@ -31,39 +31,51 @@ class RestApiAction extends in.handyman.command.Action with LazyLogging {
     val method = restApi.getMethod
     val property = restApi.getProperty
     val name = restApi.getName
+    val input = restApi.getInput
     val id = context.getValue("process-id")
+    val targetTable = restApi.getTargetTable
+    val dbSrc = restApi.getSource
     val sql = restApi.getValue.replaceAll("\"", "")
     logger.info(aMarker, "Rest API id#{}, name#{}, url#{}, sqlList#{}", id, name, url)
     detailMap.put("url", url)
     detailMap.put("method", method)
     detailMap.put("property", property)
+    detailMap.put("input", input)
+    detailMap.put("targetTable", targetTable)
+    detailMap.put("dbSrc", dbSrc)
+    
+    method match {
+      case "GET"  => {
+        GetRequest(context, restApi)
+      }
+      case "POST"  => {
+        PostRequest(context, restApi)
+      }
+    }
 
     context
   }
   
-  def GetRequest(context: Context, action: Action) {
+  def GetRequest(context: Context, restApi: in.handyman.dsl.CallRestApi) {
       try {
-          val url : URL = new URL("http://localhost:8080/RESTfulExample/json/product/get");
-          val conn : HttpURLConnection = url.openConnection().asInstanceOf[HttpURLConnection];
-          conn.setRequestMethod("GET");
-          conn.setRequestProperty("Accept", "application/json");
-  
-          if (conn.getResponseCode() != 200) {
-              throw new RuntimeException("Failed : HTTP error code : "
-                      + conn.getResponseCode());
+          val client = HttpClients.createDefault()
+          val getRequest = new HttpGet(restApi.getUrl)
+          getRequest.addHeader("Accept", "application/json")
+          
+          val response = client.execute(getRequest)
+          logger.info("Rest Api Response: " +  response + " for URL: " + restApi.getUrl)
+        
+          val entity = response.getEntity()
+          var content = ""
+          if (entity != null) {
+            val inputStream = entity.getContent()
+            content = io.Source.fromInputStream(inputStream).getLines.mkString
+            inputStream.close
           }
-  
-          val br : BufferedReader = new BufferedReader(new InputStreamReader(
-              (conn.getInputStream())));
-  
-          var output : String = null;
-          System.out.println("Output from Server .... \n");
-          while ((output = br.readLine()) != null) {
-              System.out.println(output);
-          }
-  
-          conn.disconnect();
-
+          logger.info("Rest Api Response Content: " +  content + " for URL: " + restApi.getUrl)
+          AuditService.insertRestApiResponse(content, Integer.valueOf(context.getValue("process-id")), restApi.getTargetTable, restApi.getSource)
+          client.close()
+        
       } catch {
         case ex:MalformedURLException=>{
           logger.error(aMarker, "Stopping execution, {}", ex)
@@ -85,35 +97,27 @@ class RestApiAction extends in.handyman.command.Action with LazyLogging {
       }
   }
 
-  def PostRequest(context: Context, action: Action) {
+  def PostRequest(context: Context, restApi: in.handyman.dsl.CallRestApi) {
     try {
-        val url : URL = new URL("http://localhost:8080/RESTfulExample/json/product/post");
-        val conn : HttpURLConnection = url.openConnection().asInstanceOf[HttpURLConnection];
-        conn.setDoOutput(true);
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
+
+        val client = HttpClients.createDefault()
+        val postRequest = new HttpPost(restApi.getUrl)
+        postRequest.addHeader("Content-Type", "application/json")
+        postRequest.setEntity(new StringEntity(restApi.getInput))
         
-        val input : String = "{\"qty\":100,\"name\":\"iPad 4\"}";
-
-        val os : OutputStream = conn.getOutputStream();
-        os.write(input.getBytes());
-        os.flush();
-
-        if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                + conn.getResponseCode());
+        val response = client.execute(postRequest)
+        logger.info("Rest Api Response: " +  response + " for URL: " + restApi.getUrl)
+        
+        val entity = response.getEntity()
+        var content = ""
+        if (entity != null) {
+          val inputStream = entity.getContent()
+          content = io.Source.fromInputStream(inputStream).getLines.mkString
+          inputStream.close
         }
-
-        val br : BufferedReader = new BufferedReader(new InputStreamReader(
-                (conn.getInputStream())));
-
-        var output : String = "";
-        System.out.println("Output from Server .... \n");
-        while ((output = br.readLine()) != null) {
-            System.out.println(output);
-        }
-
-        conn.disconnect();
+        logger.info("Rest Api Response Content: " +  content + " for URL: " + restApi.getUrl)
+        AuditService.insertRestApiResponse(content, Integer.valueOf(context.getValue("process-id")), restApi.getTargetTable, restApi.getSource)
+        client.close()
 
       } catch {
         case ex:MalformedURLException=>{
