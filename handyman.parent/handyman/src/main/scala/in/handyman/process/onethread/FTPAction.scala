@@ -79,7 +79,7 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
         }
         case "downloadFile" => {
           if (remoteFile != null && !remoteFile.isEmpty()) {
-            downloadFile(remote, localDir.concat(remoteFile))
+            downloadFile(remote, localDir,localFile)
 
             var fileList: Array[String] = new Array[String](1);
             fileList(0) = remoteFile
