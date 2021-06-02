@@ -50,10 +50,8 @@ Action:
 	| Checksum
 	| JsonTransform
 	| RestApi
-	| Python);
-
-RestPart:
-	'part' 'as' partName=STRING 'with' partData=SelectStatement;
+	| Python
+	| Rest);
 
 SendEMail:
 	'sendemail' 'as' name=STRING 'db' source=STRING 'smtp-host' smtphost=STRING 'smtp-port' smtpport=STRING
@@ -201,6 +199,28 @@ Python:
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
+	
+Rest:
+	'rest' 'as' name=STRING 'secured-by' authtoken=STRING 'with-url' url=STRING 'and-method-as' method=STRING
+	'with-authentication-type' authenticationType=STRING
+	'{'
+	'from' resourcedatafrom=STRING 'update-url-with' '{'
+	urldata=SelectStatement
+	'}'
+	'from' headerdatafrom=STRING 'update-header-with' '{'
+	headerdata=SelectStatement
+	'}'
+	'from' postdatafrom=STRING 'update-body-with' '{'
+	'parent' 'as' parentName=STRING parentdata=SelectStatement
+	parts+=(RestPart)*
+	'}'
+	'into' ackdatato=STRING 'store-ack-at' '{'
+	ackdata=SelectStatement
+	'}'
+	'}' 'on-condition' condition=Expression;
+
+RestPart:
+	'part' 'as' partName=STRING 'with' partData=SelectStatement;
 
 Column:
 	STRING;
