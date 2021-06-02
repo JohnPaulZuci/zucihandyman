@@ -81,7 +81,7 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
         }
         case "deleteFile"  => deleteFile(remote)
         case "removeDir"  => removeDir(remote)
-        case "downloadFile"  => downloadFile(remote, local)
+        case "downloadFile"  => downloadFile(remote, localDir,localFile)
         case "cd"  => cd(remoteDir)
         case "md"  => md(remoteDir)
         case "uploadFile"  => {
@@ -186,9 +186,11 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     
     for(fFile <- ftpFiles){
       if (fFile.isFile()) {
+        
         val outfile : File = new File(localDir + "/" + fFile.getName());
+        
         outfile.createNewFile();
-         
+        
         val output : FileOutputStream = new FileOutputStream(outfile);
 
         client.retrieveFile(fFile.getName(), output);
@@ -207,7 +209,14 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     client.removeDirectory(remote)
   }
     
-  def downloadFile(remote: String, local: String) {
+  def downloadFile(remote: String, localdir: String,localFile: String) {
+    val f : File = new File(localdir)
+    val local = localdir.concat(localFile)
+    if(!f.exists())
+    {
+      logger.info(s"No dir exists");
+      f.mkdir();
+    }
     val os = new FileOutputStream(new File(local))
 
     if(client.retrieveFile(remote, os)){
