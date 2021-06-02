@@ -45,23 +45,11 @@ Action:
 	| SendEMail
 	| Mongo2Db
 	| FTP
-	| RandForestRegressModelTraining
-	| RandForestRegressModelTesting
-	| RandForestRegressModelEvaluation
-	| RandForestClassifyModelTraining
-	| RandForestClassifyModelTesting
-	| RandForestClassifyModelEvaluation
-	| GradBoostRegressModelTraining
-	| GradBoostRegressModelTesting
-	| GradBoostRegressModelEvaluation
-	| GradBoostClassifyModelTraining
-	| GradBoostClassifyModelTesting
-	| GradBoostClassifyModelEvaluation
 	| Unzip
 	| Zip
 	| Checksum
 	| JsonTransform
-	| CallRestApi
+	| RestApi
 	| Python);
 
 RestPart:
@@ -167,107 +155,10 @@ Mongo2Db:
 
 FTP:
 	'ftp' 'as' name=STRING 'host' host=STRING 'port' port=STRING 'username' username=STRING 'password' password=STRING
-	'action' action=STRING
-	'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file'
-	remoteFile=STRING 'using'
+	'action' action=STRING 'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file'
+	remoteFile=STRING 'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-RandForestRegressModelTraining:
-	'randomforestregressionmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING
-	'output-feature-name' featureName=STRING 'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-RandForestRegressModelTesting:
-	'randomforestregressionmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-RandForestRegressModelEvaluation:
-	'randomforestregressionmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-RandForestClassifyModelTraining:
-	'randomforestclassificationmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING
-	'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-RandForestClassifyModelTesting:
-	'randomforestclassificationmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-RandForestClassifyModelEvaluation:
-	'randomforestclassificationmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-GradBoostRegressModelTraining:
-	'gradientboostregressionmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING
-	'output-feature-name' featureName=STRING 'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-GradBoostRegressModelTesting:
-	'gradientboostregressionmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-GradBoostRegressModelEvaluation:
-	'gradientboostregressionmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-GradBoostClassifyModelTraining:
-	'gradientboostclassificationmodeltraining' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'algorithm-name' algorithmName=STRING
-	'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-GradBoostClassifyModelTesting:
-	'gradientboostclassificationmodeltesting' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-GradBoostClassifyModelEvaluation:
-	'gradientboostclassificationmodelevaluation' 'as' name=STRING 'host' host=STRING 'port' port=STRING
-	'username' username=STRING 'password' password=STRING 'template-name' templateName=STRING
-	'process-id' processId=STRING 'pipeline-name' pipelineName=STRING 'call-back-url' callBackUrl=STRING 'using'
-	'{'
-	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
 Zip:
@@ -298,8 +189,9 @@ JsonTransform:
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
-CallRestApi:
-	'callrestapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'using'
+RestApi:
+	'restapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'payload' payload=STRING 
+	'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;

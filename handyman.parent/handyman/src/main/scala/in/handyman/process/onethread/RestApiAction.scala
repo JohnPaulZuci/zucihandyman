@@ -1,17 +1,17 @@
 package in.handyman.process.onethread
 
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStream
-import java.net.HttpURLConnection
 import java.net.MalformedURLException
-import java.net.URL
 
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.HttpClients
 import org.slf4j.MarkerFactory
 
 import com.typesafe.scalalogging.LazyLogging
 
+import in.handyman.audit.AuditService
 import in.handyman.command.CommandProxy
 import in.handyman.command.Context
 import in.handyman.dsl.Action
@@ -20,125 +20,130 @@ import in.handyman.util.ParameterisationEngine
 
 class RestApiAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
-  val auditMarker = "CALLRESTAPI";
+  val auditMarker = "RestApi";
   val aMarker = MarkerFactory.getMarker(auditMarker);
 
-  def execute(context: Context, action: Action, actionId:Integer): Context = {
-    val restApiAsIs = action.asInstanceOf[in.handyman.dsl.CallRestApi]
-    val restApi: in.handyman.dsl.CallRestApi = CommandProxy.createProxy(restApiAsIs, classOf[in.handyman.dsl.CallRestApi], context)
+  def execute(context: Context, action: Action, actionId: Integer): Context = {
+    val restApiAsIs = action.asInstanceOf[in.handyman.dsl.RestApi]
+    val restApi: in.handyman.dsl.RestApi = CommandProxy.createProxy(restApiAsIs, classOf[in.handyman.dsl.RestApi], context)
 
     val url = restApi.getUrl
     val method = restApi.getMethod
     val property = restApi.getProperty
     val name = restApi.getName
+    val payload = restApi.getPayload
     val id = context.getValue("process-id")
+    val targetTable = restApi.getTargetTable
+    val dbSrc = restApi.getSource
     val sql = restApi.getValue.replaceAll("\"", "")
     logger.info(aMarker, "Rest API id#{}, name#{}, url#{}, sqlList#{}", id, name, url)
     detailMap.put("url", url)
     detailMap.put("method", method)
     detailMap.put("property", property)
+    detailMap.put("payload", payload)
+    detailMap.put("targetTable", targetTable)
+    detailMap.put("dbSrc", dbSrc)
+
+    method match {
+      case "GET" => {
+        GetRequest(context, restApi)
+      }
+      case "POST" => {
+        PostRequest(context, restApi)
+      }
+    }
 
     context
   }
-  
-  def GetRequest(context: Context, action: Action) {
-      try {
-          val url : URL = new URL("http://localhost:8080/RESTfulExample/json/product/get");
-          val conn : HttpURLConnection = url.openConnection().asInstanceOf[HttpURLConnection];
-          conn.setRequestMethod("GET");
-          conn.setRequestProperty("Accept", "application/json");
-  
-          if (conn.getResponseCode() != 200) {
-              throw new RuntimeException("Failed : HTTP error code : "
-                      + conn.getResponseCode());
-          }
-  
-          val br : BufferedReader = new BufferedReader(new InputStreamReader(
-              (conn.getInputStream())));
-  
-          var output : String = null;
-          System.out.println("Output from Server .... \n");
-          while (({ output = br.readLine(); output != null })) {
-              System.out.println(output);
-          }
-  
-          conn.disconnect();
 
-      } catch {
-        case ex:MalformedURLException=>{
-          logger.error(aMarker, "Stopping execution, {}", ex)
-          detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
-          throw ex
-        }
-        
-        case ex: IOException => {
-          logger.error(aMarker, "Stopping execution, {} ", ex)
-          detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
-          throw ex
-        }
-        
-        case ex: Throwable => {
-          logger.error(aMarker, "Stopping execution, {}", ex)
-          detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
-          throw ex
-        }
-      }
-  }
-
-  def PostRequest(context: Context, action: Action) {
+  def GetRequest(context: Context, restApi: in.handyman.dsl.RestApi) {
     try {
-        val url : URL = new URL("http://localhost:8080/RESTfulExample/json/product/post");
-        val conn : HttpURLConnection = url.openConnection().asInstanceOf[HttpURLConnection];
-        conn.setDoOutput(true);
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        
-        val input : String = "{\"qty\":100,\"name\":\"iPad 4\"}";
+      val client = HttpClients.createDefault()
+      val getRequest = new HttpGet(restApi.getUrl)
+      getRequest.addHeader("Accept", "application/json")
 
-        val os : OutputStream = conn.getOutputStream();
-        os.write(input.getBytes());
-        os.flush();
+      val response = client.execute(getRequest)
+      logger.info("Rest Api Response: " + response + " for URL: " + restApi.getUrl)
 
-        if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                + conn.getResponseCode());
-        }
-
-        val br : BufferedReader = new BufferedReader(new InputStreamReader(
-                (conn.getInputStream())));
-
-        var output : String = "";
-        System.out.println("Output from Server .... \n");
-        while (({ output = br.readLine(); output != null })) {
-            System.out.println(output);
-        }
-
-        conn.disconnect();
-
-      } catch {
-        case ex:MalformedURLException=>{
-          logger.error(aMarker, "Stopping execution, {}", ex)
-          detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
-          throw ex
-        }
-        
-        case ex: IOException => {
-          logger.error(aMarker, "Stopping execution, {} ", ex)
-          detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
-          throw ex
-        }
-        
-        case ex: Throwable => {
-          logger.error(aMarker, "Stopping execution, {}", ex)
-          detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
-          throw ex
-        }
+      val entity = response.getEntity()
+      var content = ""
+      if (entity != null) {
+        val inputStream = entity.getContent()
+        content = io.Source.fromInputStream(inputStream).getLines.mkString
+        inputStream.close
       }
+      logger.info("Rest Api Response Content: " + content + " for URL: " + restApi.getUrl)
+      AuditService.insertRestApiResponse(content, Integer.valueOf(context.getValue("process-id")), restApi.getTargetTable, restApi.getSource)
+      client.close()
+
+    } catch {
+      case ex: MalformedURLException => {
+        logger.error(aMarker, "Stopping execution, {}", ex)
+        detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
+        throw ex
+      }
+
+      case ex: IOException => {
+        logger.error(aMarker, "Stopping execution, {} ", ex)
+        detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
+        throw ex
+      }
+
+      case ex: Throwable => {
+        logger.error(aMarker, "Stopping execution, {}", ex)
+        detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
+        throw ex
+      }
+    }
   }
-  
+
+  def PostRequest(context: Context, restApi: in.handyman.dsl.RestApi) {
+    try {
+
+      val client = HttpClients.createDefault()
+      val postRequest = new HttpPost(restApi.getUrl)
+      postRequest.addHeader("Content-Type", "application/json")
+      postRequest.addHeader("Accept", "application/json")
+      postRequest.setEntity(new StringEntity(restApi.getPayload))
+
+      val response = client.execute(postRequest)
+      logger.info("Rest Api Response: " + response + " for URL: " + restApi.getUrl)
+
+      val entity = response.getEntity()
+      var content = ""
+      if (entity != null) {
+        val inputStream = entity.getContent()
+        content = io.Source.fromInputStream(inputStream).getLines.mkString
+        inputStream.close
+      }
+      logger.info("Rest Api Response Content: " + content + " for URL: " + restApi.getUrl)
+      AuditService.insertRestApiResponse(content, Integer.valueOf(context.getValue("process-id")), restApi.getTargetTable, restApi.getSource)
+      client.close()
+
+    } catch {
+      case ex: MalformedURLException => {
+        logger.error(aMarker, "Stopping execution, {}", ex)
+        detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
+        throw ex
+      }
+
+      case ex: IOException => {
+        logger.error(aMarker, "Stopping execution, {} ", ex)
+        detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
+        throw ex
+      }
+
+      case ex: Throwable => {
+        logger.error(aMarker, "Stopping execution, {}", ex)
+        detailMap.put("Exception", ExceptionUtil.completeStackTraceex(ex))
+        throw ex
+      }
+    }
+  }
+
   def executeIf(context: Context, action: Action): Boolean = {
-    val restApiAsIs = action.asInstanceOf[in.handyman.dsl.CallRestApi]
-    val restApi: in.handyman.dsl.CallRestApi = CommandProxy.createProxy(restApiAsIs, classOf[in.handyman.dsl.CallRestApi], context)
+    val restApiAsIs = action.asInstanceOf[in.handyman.dsl.RestApi]
+    val restApi: in.handyman.dsl.RestApi = CommandProxy.createProxy(restApiAsIs, classOf[in.handyman.dsl.RestApi], context)
     val name = restApi.getName
     val id = context.getValue("process-id")
     val expression = restApi.getCondition

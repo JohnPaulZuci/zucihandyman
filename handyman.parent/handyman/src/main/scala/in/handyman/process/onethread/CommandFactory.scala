@@ -25,20 +25,8 @@ object CommandFactory {
       case "zip" => new ZipAction
       case "unzip" => new UnzipAction
       case "checksum" => new ChecksumAction
-      case "randforestregressmodeltraining" => new RandForestRegressModelTrainingAction
-      case "randforestregressmodeltesting" => new RandForestRegressModelTestingAction
-      case "randforestregressmodelevaluation" => new RandForestRegressModelEvaluationAction
-      case "randforestclassifymodeltraining" => new RandForestClassifyModelTrainingAction
-      case "randforestclassifymodeltesting" => new RandForestClassifyModelTestingAction
-      case "randforestclassifymodelevaluation" => new RandForestClassifyModelEvaluationAction
-      case "gradboostregressmodeltraining" => new GradBoostRegressModelTrainingAction
-      case "gradboostregressmodeltesting" => new GradBoostRegressModelTestingAction
-      case "gradboostregressmodelevaluation" => new GradBoostRegressModelEvaluationAction
-      case "gradboostclassifymodeltraining" => new GradBoostClassifyModelTrainingAction
-      case "gradboostclassifymodeltesting" => new GradBoostClassifyModelTestingAction
-      case "gradboostclassifymodelevaluation" => new GradBoostClassifyModelEvaluationAction
       case "jsontransform" => new JsonTransformAction
-      case "callrestapi" => new RestApiAction
+      case "restapi" => new RestApiAction
       case "python" => new PythonAction
     }
   }
