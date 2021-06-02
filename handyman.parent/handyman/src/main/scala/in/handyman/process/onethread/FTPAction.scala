@@ -239,7 +239,15 @@ class FTPAction extends in.handyman.command.Action with LazyLogging {
     client.removeDirectory(remote)
   }
 
-  def downloadFile(remote: String, local: String) {
+  def downloadFile(remote: String, localdir: String, localFile: String) {
+
+    val f: File = new File(localdir)
+    val local = localdir.concat(localFile)
+    if (!f.exists()) {
+      logger.info(s"Directory does not exist");
+      f.mkdir();
+    }
+
     val os = new FileOutputStream(new File(local))
 
     if (client.retrieveFile(remote, os)) {
