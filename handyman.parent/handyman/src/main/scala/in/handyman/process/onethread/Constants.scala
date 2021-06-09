@@ -13,4 +13,8 @@ object Constants {
   val FIELD_SEPARATOR=","
   val INSERT_STMT_VALUE_START="("
   val INSERT_STMT_VALUE_END=")"
+  val SEMICOLON=";"
+  val OPEN_PARENTHESES="("
+  val CLOSE_PARENTHESES=")"
+  val SPACE=" "
 }

@@ -26,6 +26,7 @@ object CommandFactory {
       case "unzip" => new UnzipAction
       case "checksum" => new ChecksumAction
       case "jsontransform" => new JsonTransformAction
+      case "jsondeserialize" => new JsonDeserializeAction
       case "restapi" => new RestApiAction
       case "python" => new PythonAction
     }

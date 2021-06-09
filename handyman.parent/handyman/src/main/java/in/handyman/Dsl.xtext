@@ -52,6 +52,7 @@ Action:
 	| RestApi
 	| Python
 	| Rest
+	| JsonDeserialize
 	);
 
 SendEMail:
@@ -189,7 +190,11 @@ JsonTransform:
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
-
+JsonDeserialize:
+	'jsondeserialize' 'as' name=STRING 'from' source=STRING 'target-table' targetTable=STRING 'input' input=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
 RestApi:
 	'restapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'payload'
 	payload=STRING
