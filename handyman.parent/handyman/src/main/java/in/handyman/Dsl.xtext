@@ -53,6 +53,12 @@ Action:
 	| Python
 	| Rest
 	| JsonDeserialize
+	| ListFiles
+	| DeleteSql
+	| UpdateSql
+	| InsertSql
+	| TruncateSql
+	| DropSql
 	);
 
 SendEMail:
@@ -140,6 +146,37 @@ Transform:
 	'transform' 'as' name=STRING 'on' on=STRING 'using'
 	'{'
 	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+DeleteSql:
+	'deletesql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+UpdateSql:
+	'updatesql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+InsertSql:
+	'insertsql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+TruncateSql:
+	'truncatesql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+DropSql:
+	'dropsql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+
+ListFiles:
+	'listfiles' 'as' name=STRING 'from' source=STRING 'on' to=STRING 'target-table' targetTable=STRING 'using'
+	'{'
+	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
 Mongo2Db:

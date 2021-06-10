@@ -29,6 +29,12 @@ object CommandFactory {
       case "jsondeserialize" => new JsonDeserializeAction
       case "restapi" => new RestApiAction
       case "python" => new PythonAction
+      case "listfiles" => new ListFilesAction
+      case "insertsql" => new InsertSqlAction
+      case "updatesql" => new UpdateSqlAction
+      case "dropsql" => new DropSqlAction
+      case "deletesql" => new DeleteSqlAction
+      case "truncatesql" => new TruncateSqlAction
     }
   }
 }
