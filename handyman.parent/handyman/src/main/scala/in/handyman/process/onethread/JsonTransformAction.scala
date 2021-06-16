@@ -16,6 +16,9 @@ import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
 import in.handyman.audit.AuditService
+import java.sql.JDBCType
+import java.util.Arrays
+
 
 class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
@@ -50,14 +53,31 @@ class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
           val jsonObject: JSONObject = new JSONObject()
 
           while (rs.next()) {
-            for (i <- 1 to columnCount) {
-              jsonObject.put(rsMetaData.getColumnLabel(i), rs.getObject(i))
-            }
+        	  for (i <- 1 to columnCount) {
+        		  val isArray:String = rs.getObject(i)+""
+
+        				  if(isArray.charAt(0) == '['){
+
+        					  val str = rs.getString(i).substring(1, rs.getString(i).length()-1);
+        					  var strReplace:Array[String] = str.replace("\"", "").split(",")
+        						jsonObject.put(rsMetaData.getColumnLabel(i), strReplace)
+
+        				  }
+        				  else{
+        					  jsonObject.put(rsMetaData.getColumnLabel(i), rs.getObject(i))
+        				  }
+
+
+        	  }
           }
+          println("-------------------------------------------------------------")
+          println(jsonObject)
           val st = conn.prepareStatement("INSERT INTO " + targetTable + "(process_id, json, updated_date) VALUES (?, ?, NOW());", Statement.RETURN_GENERATED_KEYS)
           st.setInt(1, Integer.valueOf(id))
-          st.setString(2, jsonObject.toString())
+          st.setObject(2,jsonObject,JDBCType.JAVA_OBJECT)
+          
           val rowsUpdated = st.executeUpdate()
+          detailMap.put("resiltt", jsonObject.toString())
 
           conn.commit
         } catch {
