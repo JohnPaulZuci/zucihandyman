@@ -71,8 +71,8 @@ class ChecksumAction extends in.handyman.command.Action with LazyLogging {
       else 
         isEqual = "false"
         
-      context.addValue(name + "." + remoteFile, isEqual)
-      detailMap.put(name + "." + remoteFile, isEqual)
+      context.addValue(name + "." +"status", isEqual)
+      detailMap.put(name + "." + "status", isEqual)
       
       logger.info(aMarker, "Checksum id#{}, name#{}, remoteFile#{}, localFile=#{}, isEqual=#{}", 
           instanceId, name, remoteFileChecksum, localFileChecksum, isEqual)          
