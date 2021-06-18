@@ -398,9 +398,9 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
         val operator: String = String.valueOf(condObj.get("operator"))
         var colVal: String = String.valueOf(condObj.get("value"))
         
-        if (colVal != null && !colVal.isEmpty()) {
+        //if (colVal != null && !colVal.isEmpty()) {
           var colFormatted: Date = null;
-          if (colType.equals("date") && !colFormat.isEmpty()) {
+          if (colType.equals("date") && !colFormat.isEmpty() && colVal != null && !colVal.isEmpty()) {
             colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
   
             if (filObj == null) {
@@ -415,7 +415,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
                 filObj = filObj.append(operator, colVal);
               }
           }
-        }
+        //}
       }
       obj.add(new BasicDBObject(col, filObj));
     }
