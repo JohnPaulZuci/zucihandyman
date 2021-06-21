@@ -416,9 +416,9 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
               }
             }else{
               if (filObj == null) {
-                filObj = new BasicDBObject(operator, colVal);
+                filObj = new BasicDBObject(operator, String.valueOf(colVal));
               } else {
-                filObj = filObj.append(operator, colVal);
+                filObj = filObj.append(operator, String.valueOf(colVal));
               }
           }
           }
