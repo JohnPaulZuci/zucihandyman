@@ -4,6 +4,7 @@ import java.lang.reflect.Method
 import java.sql.SQLException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.ArrayList
 import java.util.Date
 import java.util.HashMap
 import java.util.HashSet
@@ -24,11 +25,9 @@ import com.typesafe.scalalogging.LazyLogging
 import in.handyman.command.CommandProxy
 import in.handyman.config.ConfigurationService
 import in.handyman.config.Resource
+import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
-import com.mongodb.BasicDBList
-import java.util.ArrayList
-import in.handyman.util.ExceptionUtil
 
 class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
@@ -396,12 +395,12 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       for (j <- 0 to condArr.length() - 1) {
         val condObj: JSONObject = condArr.get(j).asInstanceOf[JSONObject];
         val operator: String = String.valueOf(condObj.get("operator"))
-        var colVal: String = String.valueOf(condObj.get("value"))
+        var colVal: Object = condObj.get("value")
         
         //if (colVal != null && !colVal.isEmpty()) {
           var colFormatted: Date = null;
-          if (colType.equals("date") && !colFormat.isEmpty() && colVal != null && !colVal.isEmpty()) {
-            colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
+          if (colType.equals("date") && !colFormat.isEmpty() && colVal != null) {
+            colFormatted = new SimpleDateFormat(colFormat).parse(String.valueOf(colVal));
   
             if (filObj == null) {
               filObj = new BasicDBObject(operator, colFormatted);
