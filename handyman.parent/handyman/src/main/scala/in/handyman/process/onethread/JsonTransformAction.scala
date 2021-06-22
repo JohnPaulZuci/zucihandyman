@@ -18,6 +18,7 @@ import in.handyman.util.ResourceAccess
 import in.handyman.audit.AuditService
 import java.sql.JDBCType
 import java.util.Arrays
+import org.json.JSONArray
 
 
 class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
@@ -58,9 +59,8 @@ class JsonTransformAction extends in.handyman.command.Action with LazyLogging {
 
         				  if(isArray.charAt(0) == '['){
 
-        					  val str = rs.getString(i).substring(1, rs.getString(i).length()-1);
-        					  var strReplace:Array[String] = str.replace("\"", "").split(",")
-        						jsonObject.put(rsMetaData.getColumnLabel(i), strReplace)
+        					  val jsonArray : JSONArray = new JSONArray(isArray)
+        						jsonObject.put(rsMetaData.getColumnLabel(i), jsonArray)
 
         				  }
         				  else{
