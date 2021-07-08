@@ -35,6 +35,7 @@ object CommandFactory {
       case "dropsql" => new DropSqlAction
       case "deletesql" => new DeleteSqlAction
       case "truncatesql" => new TruncateSqlAction
+      case "hive" => new HiveAction
     }
   }
 }
