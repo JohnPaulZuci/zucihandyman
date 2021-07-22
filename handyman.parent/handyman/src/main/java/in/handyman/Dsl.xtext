@@ -59,6 +59,7 @@ Action:
 	| InsertSql
 	| TruncateSql
 	| DropSql
+	| Hive
 	);
 
 SendEMail:
@@ -144,6 +145,11 @@ LoadCsv:
 
 Transform:
 	'transform' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+Hive:
+	'hive' 'as' name=STRING 'on' on=STRING 'using'
 	'{'
 	value+=NonSelectStatement
 	'}' 'on-condition' condition=Expression;
