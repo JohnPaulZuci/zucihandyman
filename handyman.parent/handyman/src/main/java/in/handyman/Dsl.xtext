@@ -1,3 +1,4 @@
+
 grammar in.handyman.Dsl with org.eclipse.xtext.common.Terminals
 
 generate dsl "http://www.handyman.in/Dsl"
@@ -70,7 +71,8 @@ Action:
 	| DropboxCleanup
 	| Soap
 	| JSONTransformation
-	| SendEMail);
+	| SendEMail
+	| Ldap);
 
 DeleteFolder:
 	'deletefolder' 'as' name=STRING 'folder' foldersource=STRING 'zipfile' zipsource=STRING
@@ -93,7 +95,7 @@ Mail:
 SendEMail:
 	'sendemail' 'as' name=STRING 'db' source=STRING 'smtp-host' smtphost=STRING 'smtp-port' smtpport=STRING 
 	'from' from=STRING 'pass' pass=STRING 'to' to=STRING 'cc' cc=STRING
-	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'signature' signature=STRING 'using'
+	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'signature' signature=STRING  'success' success=STRING 'failed' failed=STRING 'color' color=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
@@ -213,7 +215,8 @@ SendMail:
 	'{'
 	value=STRING
 	'}' 'on-condition' condition=Expression 'do-dryrun-with' dryrunMail=STRING;
-
+Ldap:
+	'ldap' 'as' name=STRING 'provider-url' URL=STRING 'on' ON=STRING 'security-principal' SECURITY=STRING 'target-table-name' targetTableName=STRING 'passsword' password=STRING condition=Expression;
 GooglecontactPUT:
 	'gcontact' 'as' name=STRING 'through-account' account=STRING 'secured-by' privateKey=STRING 'with-key'
 	ptwelveFile=STRING 'for-project' project=STRING 'on-behalf-of' impersonatedUser=STRING 'from-source' dbSrc=STRING

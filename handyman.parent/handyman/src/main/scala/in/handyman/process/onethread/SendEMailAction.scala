@@ -58,24 +58,38 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     val cc = mail.getCc
     val bcc = mail.getBcc
     val signature = mail.getSignature
+    val arrOfSuccess: Array[String] = mail.getSuccess.split(",")
+    val arrOfFailed: Array[String] = mail.getFailed.split(",")
+    val arrOfColor: Array[String] = mail.getColor.split(",")
+    var i:Int = -1
+    var j:Int = -1
+    
     val con = ResourceAccess.rdbmsConn(source)
     st = con.createStatement()
+ 
     con.setAutoCommit(false)
-    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width:max-content; max-width:max-content;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:#98dcff;}</style></head><body>"
+    var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width:max-content; max-width:max-content;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:red;}</style></head><body>"
     sqlList.foreach { sql =>
+      i += 1
+      j += 1
       if (!sql.trim.isEmpty()) {
+          
         logger.info(aMarker, "Transform id#{}, executing script {}", id, sql.trim)
         val statementId = AuditService.insertStatementAudit(actionId, "transform->" + name, context.getValue("process-name"))
         try {
           val rs = st.executeQuery(sql)
           val col: Int = rs.getMetaData.getColumnCount
+          
           val colData = new ArrayList[String]()
+          
           if ((!rs.next())) {
-            text = text + "<h5 class='heading'>" + "NO RECORDS PROCESSED TODAY" + "</h5>";
+            text = text + "<TR><BR><H3>"+arrOfFailed(i)+"</H3></TR>"
           } else {
-            text = text + "<br><table border='1' align='center' class='table-view'> <thead class='thead-view'> <tr align='center'>"
+            text = text + "<TR><BR><H3>"+arrOfSuccess(j)+"</H3></TR>"
+            text = text + "<table border='1' align='center' class='table-view'> <thead class='thead-view'> <tr align='center'>"
             var i: Int = 1
             while (i <= col) {
+              
               text = text + "<td><b>" + rs.getMetaData.getColumnLabel(i) + "<b></td>"
               colData.add(rs.getMetaData.getColumnLabel(i))
               i = i + 1
@@ -84,7 +98,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
             var colorCount: Int = 1;
             do {
               if (colorCount % 2 == 0) {
-                text = text + "<tr class='back-view'>"
+                text = text + "<tr style=background-color:"+arrOfColor(j)+">"
               } else {
                 text = text + "<tr>"
               }
@@ -139,6 +153,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
       message.setSentDate(new Date())
       message.setSubject(subject)
       message.setContent(content, "text/html;charset=utf-8")
+      
       sendMessage
 
       // throws MessagingException
