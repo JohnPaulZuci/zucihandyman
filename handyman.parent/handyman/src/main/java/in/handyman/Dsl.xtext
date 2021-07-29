@@ -293,10 +293,11 @@ Callprocess:
 	'}' 'on-condition' condition=Expression;
 	
 Forkprocess:
-	'forkprocess' 'as' name=STRING 'with-target' target=STRING 'from-file' source=STRING 'using' datasource=STRING 'for-every' 
-	'{'
-		value=SelectStatement
-	'}' 'on-condition' condition=Expression;
+    'forkprocess' 'as' name=STRING 'with-target' target=STRING 'from-file' source=STRING 'using' datasource=STRING
+    'for-every'
+    '{'
+    value=SelectStatement
+    '}' 'watermark' forkBatchSize=STRING 'on-condition' condition=Expression;
 
 Updatedaudit:
 	'log' 'as' name=STRING 'logto' logsink=STRING 'in' datasource=STRING 'using'

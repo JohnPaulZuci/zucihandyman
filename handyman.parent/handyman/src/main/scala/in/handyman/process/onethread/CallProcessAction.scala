@@ -74,21 +74,11 @@ class CallProcessAction extends in.handyman.command.Action with LazyLogging {
       detailMap.put("dataSource", dbSrc)
       detailMap.put("sql", sql)
 
-    } 
-   finally {
-           try{
-              rs.close
-              stmt.close
-              if(conn != null && !conn.isClosed())
-                conn.close
-              }catch{
-               case ex: Throwable => {
-                  handleError(ex)
-                  detailMap.put("exception", ExceptionUtil.completeStackTraceex(ex))          
-                                      }
-               }
-            }
-
+    } finally {
+      rs.close
+      stmt.close
+      conn.close
+    }
     context
   }
 
