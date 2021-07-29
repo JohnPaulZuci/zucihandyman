@@ -57,6 +57,8 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
     while (rs.next()) {
       val tryContext = new TryContext(new scala.collection.immutable.HashMap[String, String](), processName)
       tryContext.addValue("basepath", context.getValue("basepath"))
+      tryContext.addValue("root-ref", context.getValue("root-ref"))
+      
       for (i <- 1 until columnCount + 1) {
         val key = rs.getMetaData.getColumnLabel(i)
         val value = rs.getString(i)
