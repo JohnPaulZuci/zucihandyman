@@ -40,29 +40,30 @@ class CopydataAction extends in.handyman.command.Action with LazyLogging {
 
     copydataDbConnto.setAutoCommit(false)
 
-    val output: Array[String] = ddlSql.split(";")
-    val select: String = output(0)
-    val slimit: String = copyData.getLimit
-    val limit: Int = slimit.toInt
-
-    val rs = copydataStmtfrom.executeQuery(select)
-
-    val cols: Int = rs.getMetaData().getColumnCount()
-
-    var tcolumn: String = ""
-    var column: String = ""
-
-    val i: Int = 0
-    for (i <- 1 to cols) {
-      tcolumn = rs.getMetaData().getColumnName(i)
-      column = column + tcolumn + ","
-    }
-
-    column = column.substring(0, column.length() - 1)
-
-    var query: String = ""
-    var j: Int = 0
     try {
+
+      val output: Array[String] = ddlSql.split(";")
+      val select: String = output(0)
+      val slimit: String = copyData.getLimit
+      val limit: Int = slimit.toInt
+
+      val rs = copydataStmtfrom.executeQuery(select)
+
+      val cols: Int = rs.getMetaData().getColumnCount()
+
+      var tcolumn: String = ""
+      var column: String = ""
+
+      val i: Int = 0
+      for (i <- 1 to cols) {
+        tcolumn = rs.getMetaData().getColumnName(i)
+        column = column + tcolumn + ","
+      }
+
+      column = column.substring(0, column.length() - 1)
+
+      var query: String = ""
+      var j: Int = 0
 
       while (rs.next()) {
         val i: Int = 0
@@ -106,6 +107,9 @@ class CopydataAction extends in.handyman.command.Action with LazyLogging {
     } catch {
       case ex: SQLException => {
         ex.printStackTrace()
+        var insert:String = "insert into jdbc_connection_failure (error) values ('Authentication failed or connection lost')";
+        copydataStmtto.execute(insert)
+        copydataDbConnto.commit()
       }
     } finally {
       copydataStmtfrom.close()

@@ -66,7 +66,7 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
     
     val con = ResourceAccess.rdbmsConn(source)
     st = con.createStatement()
- 
+    
     con.setAutoCommit(false)
     var text: String = "<html><head><style>.heading {color: #d63384; text-align:center; } .table-view{text-indent: initial;border-spacing: 2px;border-color: grey;display: table;    border-collapse: collapse;width:max-content; max-width:max-content;margin-bottom: 1rem;background-color: transparent;font-size: 1rem;font-weight: 400;line-height: 1.5;color: #212529;text-align: left;background-color: #fff;margin: 0;font-family:lato;white-space: nowrap} .thead-view{display: table-header-group; vertical-align: middle;border-color: inherit;} .back-view{background-color:red;}</style></head><body>"
     sqlList.foreach { sql =>
@@ -74,7 +74,6 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
       j += 1
       if (!sql.trim.isEmpty()) {
           
-        logger.info(aMarker, "Transform id#{}, executing script {}", id, sql.trim)
         val statementId = AuditService.insertStatementAudit(actionId, "transform->" + name, context.getValue("process-name"))
         try {
           val rs = st.executeQuery(sql)
@@ -109,7 +108,6 @@ class SendEMailAction extends in.handyman.command.Action with LazyLogging {
                   if (value.contains(".") && Objects.nonNull(value)) {
                     value = value.substring(0, value.indexOf("."));
                   }
-                  println(value)
                   text = text + "<td>" + value + "</td>";
                 } else {
                   text = text + "<td>" + rs.getObject(entry) + "</td>";
