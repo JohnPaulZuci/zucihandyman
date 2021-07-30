@@ -53,6 +53,7 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
     var cquery: String = ""
     var iquery: String = ""
     var dquery: String = ""
+    var error_row: String = ""
     var ct: String = ""
 
     logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db)
@@ -79,11 +80,25 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
         st.execute(cquery)
         while ({ nextLine = reader.readNext(); nextLine != null }) {
           values = convertArrayToInsertLine(nextLine, "','")
+          var column_length: Int = column.split("`,`").length
           count += 1
           totalcount += 1
           values = values.replace("''", "'NULL'").replace("00:00:00.0", "")
+          var value_length: Int = values.split("','").length
+           if ((value_length != column_length) || value_length == 0 ){
+      
+             var errored_row : String  = "('" + values + "),"
+             error_row = error_row + errored_row
+            logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db, errored_row)
+            println("Errored Row: "+ errored_row)
+            print("Row number: "+ count)
+            println()
+            count -= 1
+           }
+           else 
           iquery = iquery + "('" + values + "),"
-
+          
+          
           if (count % limit == 0) {
             iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".csv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
             iquery = iquery.substring(0, iquery.length() - 1) + ";"
