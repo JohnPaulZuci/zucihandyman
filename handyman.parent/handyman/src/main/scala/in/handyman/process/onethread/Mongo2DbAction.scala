@@ -13,6 +13,7 @@ import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
 
+import com.google.gson.Gson
 import com.mongodb.BasicDBObject
 import com.mongodb.client.FindIterable
 import com.mongodb.client.MongoClient
@@ -329,8 +330,10 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       val obje: Object = docObj.get(dbColForm)
       if (obje.isInstanceOf[java.util.ArrayList[Document]]) {
         val obje1 = obje.asInstanceOf[java.util.ArrayList[Document]]
-        if(obje1!=null && !obje1.isEmpty())
-        return obje1.get(0)
+        if(obje1!=null && !obje1.isEmpty()){
+          val gson : Gson = new Gson();
+          return gson.toJson(obje1);
+        }
         else
           return null;
       } else if (obje.isInstanceOf[java.util.ArrayList[_]]) {
