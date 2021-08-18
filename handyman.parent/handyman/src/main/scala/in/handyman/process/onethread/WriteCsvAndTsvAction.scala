@@ -50,7 +50,9 @@ class WriteCsvAndTsvAction extends in.handyman.command.Action with LazyLogging {
       for (i <- 1 to ncols) {
         column = ars.getString(i)
         if (column != null)
-          column = column.replaceAll("[^a-zA-Z0-9-:]", " ")
+          column = column.replaceAll("[^a-zA-Z0-9-.:]", " ")
+        if (column == null || column=="NULL" )
+              column = ""
         out.append("\"" + column + "\"")
         if (i < ncols) out.append(delim) else out.append("\r\n")
       }
