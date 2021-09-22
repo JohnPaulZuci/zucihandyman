@@ -331,8 +331,9 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       if (obje.isInstanceOf[java.util.ArrayList[Document]]) {
         val obje1 = obje.asInstanceOf[java.util.ArrayList[Document]]
         if(obje1!=null && !obje1.isEmpty()){
-          val gson : Gson = new Gson();
-          return gson.toJson(obje1);
+          /*val gson : Gson = new Gson();
+          return gson.toJson(obje1);*/
+          return obje1.get(0);
         }
         else
           return null;
