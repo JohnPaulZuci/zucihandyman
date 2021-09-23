@@ -71,7 +71,7 @@ class CopydataAction extends in.handyman.command.Action with LazyLogging {
 
           var str: String = rs.getString(i)
           if (str != null)
-            str = str.replaceAll("[^a-zA-Z0-9-:]", " ")
+            str = str.replaceAll("[^a-zA-Z0-9-:.]", " ")
           query = query + "\"" + str + "\"" + ","
 
         }
