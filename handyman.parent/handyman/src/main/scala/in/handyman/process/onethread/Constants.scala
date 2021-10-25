@@ -17,4 +17,7 @@ object Constants {
   val OPEN_PARENTHESES="("
   val CLOSE_PARENTHESES=")"
   val SPACE=" "
+  val ROW_SEPARATOR = "\r\n"
+  val DOUBLE_STRING_ENCLOSER="\""
+  val DELIM="delim"
 }
