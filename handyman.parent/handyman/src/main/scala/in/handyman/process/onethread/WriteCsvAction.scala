@@ -28,6 +28,18 @@ import in.handyman.config.ConfigurationService
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
 
+/*process "test.writecsv.process"
+{
+	try{
+		 writecsv as "test-writecsv" from "sme-cub" to "/home/thamaraiselvi/Desktop/test_writecsv.csv" with "," fielding "10" with-fetch-batch-size 
+		 "50000" with-write-batch-size "10" using
+		 {
+			"SELECT * FROM CollateralDetails;"
+		 } 
+	}
+	catch{}
+	finally{}
+}*/
 
 /**
  * TODO - Still need to add more rich ness to audit trail with respect to statement warnings
