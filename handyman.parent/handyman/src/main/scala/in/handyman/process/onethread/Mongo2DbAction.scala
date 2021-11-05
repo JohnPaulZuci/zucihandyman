@@ -285,6 +285,10 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       } else if ((colVal.isInstanceOf[java.util.ArrayList[_]])) {
         val colValObj = colVal.asInstanceOf[java.util.ArrayList[_]]
         if (colValObj != null && !colValObj.isEmpty()) {
+          val jsonArray : JSONArray = new JSONArray(colValObj);
+          logger.debug("array element....."+jsonArray.toString());
+          logger.info("array element1....."+jsonArray.toString());
+          System.out.println("array element2....."+jsonArray.toString());
           /*colValStr = ""
           colValObj.forEach(colValO => colValStr = colValStr + colValO.toString() + "|")
           queryAppend = queryAppend + "\'" + colValStr.substring(0, colValStr.length()-1) + "\'" + ","*/
