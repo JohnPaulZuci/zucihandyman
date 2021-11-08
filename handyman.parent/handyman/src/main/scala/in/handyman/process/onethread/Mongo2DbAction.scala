@@ -13,6 +13,10 @@ import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
 
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
 import com.mongodb.BasicDBObject
 import com.mongodb.client.FindIterable
 import com.mongodb.client.MongoClient
@@ -28,6 +32,7 @@ import in.handyman.config.Resource
 import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
+
 
 class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
@@ -284,6 +289,14 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       } else if ((colVal.isInstanceOf[java.util.ArrayList[_]])) {
         val colValObj = colVal.asInstanceOf[java.util.ArrayList[_]]
         if (colValObj != null && !colValObj.isEmpty()) {
+          val colva = colValObj.asInstanceOf[java.util.ArrayList[Document]]
+          
+          val gson : Gson = new GsonBuilder().create();
+          val myCustomArray : JsonArray = gson.toJsonTree(colValObj).getAsJsonArray();
+          System.out.println("array element4....."+ myCustomArray.toString());
+          System.out.println("array element5....."+ gson.toJson(colValObj));
+          System.out.println("array element6....."+ gson.toJson(colValObj, new TypeToken[ArrayList[_]]() {}.getType()))
+
           val jsonArray : JSONArray = new JSONArray(colValObj);
           logger.info("array element1....."+jsonArray.toString());
           System.out.println("array element2....."+(new JSONArray(colValObj.toArray())).toString());
