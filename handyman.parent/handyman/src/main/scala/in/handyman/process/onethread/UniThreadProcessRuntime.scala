@@ -1,20 +1,26 @@
 package in.handyman.process.onethread
 
-import in.handyman.dsl._
-import in.handyman.server.ProcessRuntime
-import com.typesafe.scalalogging.LazyLogging
-import com.fasterxml.jackson.databind.ObjectMapper
-import in.handyman.command._
-import in.handyman.server.ProcessResponse
-import in.handyman.AbortException
-import com.fasterxml.jackson.databind.SerializationFeature
+import java.util.Objects
+
 import org.slf4j.MarkerFactory
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.command.Context
+import in.handyman.command.ErrorContext
+import in.handyman.command.FinallyContext
+import in.handyman.command.TryContext
+import in.handyman.dsl.Catch
+import in.handyman.dsl.Finally
+import in.handyman.server.ProcessResponse
+import in.handyman.server.ProcessRuntime
 
 class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with LazyLogging {
   val jsonSerializer = new ObjectMapper
   val auditMarkerText = "Actioncaller";
   val auditMarker = MarkerFactory.getMarker(auditMarkerText);
-  
+
   @throws(classOf[Exception])
   def execute(process: in.handyman.dsl.Process, context: Context): ProcessResponse = {
     var errorContext: ErrorContext = new ErrorContext(context.asInstanceOf[TryContext])
@@ -30,7 +36,7 @@ class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with
         //logError(ex, process.getName)
         logger.info(auditMarker, "Abort exception caught in try block for process {}", process.getName)
         processResponse.exception = ex
-        ex.processResponse=processResponse
+        ex.processResponse = processResponse
         processResponse
         throw ex
       }
@@ -59,7 +65,6 @@ class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with
   @throws(classOf[Exception])
   def executeChain(actionList: org.eclipse.emf.common.util.EList[in.handyman.dsl.Action], context: Context): java.util.HashMap[String, java.util.Map[String, String]] =
     {
-
       val iterator = actionList.iterator
       val detailMap: java.util.HashMap[String, java.util.Map[String, String]] = new java.util.HashMap[String, java.util.Map[String, String]]
       while (iterator.hasNext) {
@@ -71,22 +76,22 @@ class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with
           actionRuntime.execute(context, action, actionId)
           //TODO still need to fix the status part
           val commandDetailAsMap = actionRuntime.generateAudit()
-          if(commandDetailAsMap!=null && !commandDetailAsMap.isEmpty()){
-          val commandDetail = jsonSerializer.writeValueAsString(commandDetailAsMap)
-          detailMap.put(action.getName + "." + actionId.toString(), commandDetailAsMap)
-          in.handyman.audit.AuditService.updateCommandAudit(actionId, 1, commandDetail)
+          if (commandDetailAsMap != null && !commandDetailAsMap.isEmpty()) {
+            val commandDetail = jsonSerializer.writeValueAsString(commandDetailAsMap)
+            detailMap.put(action.getName + "." + actionId.toString(), commandDetailAsMap)
+            in.handyman.audit.AuditService.updateCommandAudit(actionId, 1, commandDetail)
           }
         }
       }
       detailMap
     }
 
-  def logError(ex: Throwable, process:String) = {
+  def logError(ex: Throwable, process: String) = {
     logger.error(auditMarker, "Error executing process {}", process, ex)
   }
 
   def executeCatch(onError: Catch, context: TryContext): ErrorContext = {
-   // logger.warn(marker, message)
+    // logger.warn(marker, message)
     val errorContext: ErrorContext = new ErrorContext(context)
     executeChain(onError.getAction, errorContext)
     errorContext
@@ -94,7 +99,8 @@ class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with
 
   def executeFinally(onFinally: Finally, errorContext: ErrorContext): FinallyContext = {
     val finallyContext: FinallyContext = new FinallyContext(errorContext)
-    executeChain(onFinally.getAction, finallyContext)
+    if (Objects.nonNull(onFinally))
+      executeChain(onFinally.getAction, finallyContext)
     val processId: String = errorContext.getValue("process-id")
     val contextLog: String = errorContext.getJson()
     val status: Int = if (contextLog.isEmpty) 1 else -1

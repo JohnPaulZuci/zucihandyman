@@ -13,6 +13,8 @@ import in.handyman.dsl.Doozle;
 import in.handyman.dsl.Dropfile;
 import in.handyman.dsl.DslFactory;
 import in.handyman.dsl.DslPackage;
+import in.handyman.dsl.ElasticFBCLead;
+import in.handyman.dsl.ElasticGET;
 import in.handyman.dsl.ExecJava;
 import in.handyman.dsl.Expression;
 import in.handyman.dsl.FBCLead;
@@ -86,6 +88,20 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   private EClass actionEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass elasticFBCLeadEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  private EClass elasticGETEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -507,6 +523,116 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
   public EReference getAction_Condition()
   {
     return (EReference)actionEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getElasticFBCLead()
+  {
+    return elasticFBCLeadEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticFBCLead_AccessToken()
+  {
+    return (EAttribute)elasticFBCLeadEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticFBCLead_AppSecret()
+  {
+    return (EAttribute)elasticFBCLeadEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticFBCLead_AccountId()
+  {
+    return (EAttribute)elasticFBCLeadEClass.getEStructuralFeatures().get(2);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticFBCLead_CampaignId()
+  {
+    return (EAttribute)elasticFBCLeadEClass.getEStructuralFeatures().get(3);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticFBCLead_Target()
+  {
+    return (EAttribute)elasticFBCLeadEClass.getEStructuralFeatures().get(4);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticFBCLead_Value()
+  {
+    return (EAttribute)elasticFBCLeadEClass.getEStructuralFeatures().get(5);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EClass getElasticGET()
+  {
+    return elasticGETEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticGET_Source()
+  {
+    return (EAttribute)elasticGETEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticGET_To()
+  {
+    return (EAttribute)elasticGETEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EAttribute getElasticGET_Value()
+  {
+    return (EAttribute)elasticGETEClass.getEStructuralFeatures().get(2);
   }
 
   /**
@@ -2061,6 +2187,19 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
     createEAttribute(actionEClass, ACTION__NAME);
     createEReference(actionEClass, ACTION__CONDITION);
 
+    elasticFBCLeadEClass = createEClass(ELASTIC_FBC_LEAD);
+    createEAttribute(elasticFBCLeadEClass, ELASTIC_FBC_LEAD__ACCESS_TOKEN);
+    createEAttribute(elasticFBCLeadEClass, ELASTIC_FBC_LEAD__APP_SECRET);
+    createEAttribute(elasticFBCLeadEClass, ELASTIC_FBC_LEAD__ACCOUNT_ID);
+    createEAttribute(elasticFBCLeadEClass, ELASTIC_FBC_LEAD__CAMPAIGN_ID);
+    createEAttribute(elasticFBCLeadEClass, ELASTIC_FBC_LEAD__TARGET);
+    createEAttribute(elasticFBCLeadEClass, ELASTIC_FBC_LEAD__VALUE);
+
+    elasticGETEClass = createEClass(ELASTIC_GET);
+    createEAttribute(elasticGETEClass, ELASTIC_GET__SOURCE);
+    createEAttribute(elasticGETEClass, ELASTIC_GET__TO);
+    createEAttribute(elasticGETEClass, ELASTIC_GET__VALUE);
+
     execJavaEClass = createEClass(EXEC_JAVA);
     createEAttribute(execJavaEClass, EXEC_JAVA__CLASS_FQN);
     createEAttribute(execJavaEClass, EXEC_JAVA__DB_SRC);
@@ -2268,6 +2407,8 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
     // Set bounds for type parameters
 
     // Add supertypes to classes
+    elasticFBCLeadEClass.getESuperTypes().add(this.getAction());
+    elasticGETEClass.getESuperTypes().add(this.getAction());
     execJavaEClass.getESuperTypes().add(this.getAction());
     firebaseDatabasePutEClass.getESuperTypes().add(this.getAction());
     firebaseReactiveNotificationEClass.getESuperTypes().add(this.getAction());
@@ -2316,6 +2457,19 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
     initEClass(actionEClass, Action.class, "Action", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEAttribute(getAction_Name(), ecorePackage.getEString(), "name", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getAction_Condition(), this.getExpression(), null, "condition", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(elasticFBCLeadEClass, ElasticFBCLead.class, "ElasticFBCLead", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(getElasticFBCLead_AccessToken(), ecorePackage.getEString(), "accessToken", null, 0, 1, ElasticFBCLead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticFBCLead_AppSecret(), ecorePackage.getEString(), "appSecret", null, 0, 1, ElasticFBCLead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticFBCLead_AccountId(), ecorePackage.getEString(), "accountId", null, 0, 1, ElasticFBCLead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticFBCLead_CampaignId(), ecorePackage.getEString(), "campaignId", null, 0, 1, ElasticFBCLead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticFBCLead_Target(), ecorePackage.getEString(), "target", null, 0, 1, ElasticFBCLead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticFBCLead_Value(), ecorePackage.getEString(), "value", null, 0, 1, ElasticFBCLead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(elasticGETEClass, ElasticGET.class, "ElasticGET", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(getElasticGET_Source(), ecorePackage.getEString(), "source", null, 0, 1, ElasticGET.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticGET_To(), ecorePackage.getEString(), "to", null, 0, 1, ElasticGET.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getElasticGET_Value(), ecorePackage.getEString(), "value", null, 0, 1, ElasticGET.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(execJavaEClass, ExecJava.class, "ExecJava", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEAttribute(getExecJava_ClassFqn(), ecorePackage.getEString(), "classFqn", null, 0, 1, ExecJava.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

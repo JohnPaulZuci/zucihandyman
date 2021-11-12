@@ -18,8 +18,8 @@ class StartProcess extends ServerResource with LazyLogging {
     val alias = getRequest().getAttributes().get("alias");
     val instanceName: String = inboundValue.asInstanceOf[String] + "#" + alias.asInstanceOf[String]
     logger.info("Starting the process=" + instanceName)
-    val runtimeContext = ProcessAST.loadProcessAST(instanceName, "{}")
-
+    val json = entity.getText()
+    val runtimeContext = ProcessAST.loadProcessAST(instanceName, json)
     try {
 
       val processResponse = ProcessExecutor.execute(runMode, runtimeContext)
@@ -33,7 +33,7 @@ class StartProcess extends ServerResource with LazyLogging {
       handleFinally()
     }
   }
-  
+
   /*@Get("application/json")
   def represent(): String = {
     val inboundValue = getRequest.getAttributes.get("instance");

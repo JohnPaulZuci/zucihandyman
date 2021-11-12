@@ -261,6 +261,161 @@ public interface DslPackage extends EPackage
   int ACTION_FEATURE_COUNT = 2;
 
   /**
+   * The meta object id for the '{@link in.handyman.dsl.impl.ElasticFBCLeadImpl <em>Elastic FBC Lead</em>}' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see in.handyman.dsl.impl.ElasticFBCLeadImpl
+   * @see in.handyman.dsl.impl.DslPackageImpl#getElasticFBCLead()
+   * @generated
+   */
+  int ELASTIC_FBC_LEAD = 5;
+
+  /**
+   * The feature id for the '<em><b>Name</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__NAME = ACTION__NAME;
+
+  /**
+   * The feature id for the '<em><b>Condition</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__CONDITION = ACTION__CONDITION;
+
+  /**
+   * The feature id for the '<em><b>Access Token</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__ACCESS_TOKEN = ACTION_FEATURE_COUNT + 0;
+
+  /**
+   * The feature id for the '<em><b>App Secret</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__APP_SECRET = ACTION_FEATURE_COUNT + 1;
+
+  /**
+   * The feature id for the '<em><b>Account Id</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__ACCOUNT_ID = ACTION_FEATURE_COUNT + 2;
+
+  /**
+   * The feature id for the '<em><b>Campaign Id</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__CAMPAIGN_ID = ACTION_FEATURE_COUNT + 3;
+
+  /**
+   * The feature id for the '<em><b>Target</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__TARGET = ACTION_FEATURE_COUNT + 4;
+
+  /**
+   * The feature id for the '<em><b>Value</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD__VALUE = ACTION_FEATURE_COUNT + 5;
+
+  /**
+   * The number of structural features of the '<em>Elastic FBC Lead</em>' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_FBC_LEAD_FEATURE_COUNT = ACTION_FEATURE_COUNT + 6;
+
+  /**
+   * The meta object id for the '{@link in.handyman.dsl.impl.ElasticGETImpl <em>Elastic GET</em>}' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see in.handyman.dsl.impl.ElasticGETImpl
+   * @see in.handyman.dsl.impl.DslPackageImpl#getElasticGET()
+   * @generated
+   */
+  int ELASTIC_GET = 6;
+
+  /**
+   * The feature id for the '<em><b>Name</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_GET__NAME = ACTION__NAME;
+
+  /**
+   * The feature id for the '<em><b>Condition</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_GET__CONDITION = ACTION__CONDITION;
+
+  /**
+   * The feature id for the '<em><b>Source</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_GET__SOURCE = ACTION_FEATURE_COUNT + 0;
+
+  /**
+   * The feature id for the '<em><b>To</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_GET__TO = ACTION_FEATURE_COUNT + 1;
+
+  /**
+   * The feature id for the '<em><b>Value</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_GET__VALUE = ACTION_FEATURE_COUNT + 2;
+
+  /**
+   * The number of structural features of the '<em>Elastic GET</em>' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int ELASTIC_GET_FEATURE_COUNT = ACTION_FEATURE_COUNT + 3;
+
+  /**
    * The meta object id for the '{@link in.handyman.dsl.impl.ExecJavaImpl <em>Exec Java</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -268,7 +423,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getExecJava()
    * @generated
    */
-  int EXEC_JAVA = 5;
+  int EXEC_JAVA = 7;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -332,7 +487,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getFirebaseDatabasePut()
    * @generated
    */
-  int FIREBASE_DATABASE_PUT = 6;
+  int FIREBASE_DATABASE_PUT = 8;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -423,7 +578,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getFirebaseReactiveNotification()
    * @generated
    */
-  int FIREBASE_REACTIVE_NOTIFICATION = 7;
+  int FIREBASE_REACTIVE_NOTIFICATION = 9;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -505,7 +660,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getSmsLeadSms()
    * @generated
    */
-  int SMS_LEAD_SMS = 8;
+  int SMS_LEAD_SMS = 10;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -605,7 +760,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getAbort()
    * @generated
    */
-  int ABORT = 9;
+  int ABORT = 11;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -651,7 +806,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getGooglecontactSelectAll()
    * @generated
    */
-  int GOOGLECONTACT_SELECT_ALL = 10;
+  int GOOGLECONTACT_SELECT_ALL = 12;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -751,7 +906,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getSendMail()
    * @generated
    */
-  int SEND_MAIL = 11;
+  int SEND_MAIL = 13;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -833,7 +988,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getGooglecontactPUT()
    * @generated
    */
-  int GOOGLECONTACT_PUT = 12;
+  int GOOGLECONTACT_PUT = 14;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -933,7 +1088,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getGooglecalPUT()
    * @generated
    */
-  int GOOGLECAL_PUT = 13;
+  int GOOGLECAL_PUT = 15;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1033,7 +1188,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getFBCLead()
    * @generated
    */
-  int FBC_LEAD = 14;
+  int FBC_LEAD = 16;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1124,7 +1279,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getFBFormDownload()
    * @generated
    */
-  int FB_FORM_DOWNLOAD = 15;
+  int FB_FORM_DOWNLOAD = 17;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1215,7 +1370,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getDropfile()
    * @generated
    */
-  int DROPFILE = 16;
+  int DROPFILE = 18;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1261,7 +1416,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getDoozle()
    * @generated
    */
-  int DOOZLE = 17;
+  int DOOZLE = 19;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1325,7 +1480,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getRest()
    * @generated
    */
-  int REST = 18;
+  int REST = 20;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1479,7 +1634,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getRestPart()
    * @generated
    */
-  int REST_PART = 19;
+  int REST_PART = 21;
 
   /**
    * The feature id for the '<em><b>Part Name</b></em>' attribute.
@@ -1516,7 +1671,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getTrelloGET()
    * @generated
    */
-  int TRELLO_GET = 20;
+  int TRELLO_GET = 22;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1607,7 +1762,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getTrelloPUT()
    * @generated
    */
-  int TRELLO_PUT = 21;
+  int TRELLO_PUT = 23;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1698,7 +1853,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getFetch()
    * @generated
    */
-  int FETCH = 22;
+  int FETCH = 24;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1753,7 +1908,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getCallprocess()
    * @generated
    */
-  int CALLPROCESS = 23;
+  int CALLPROCESS = 25;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1826,7 +1981,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getUpdatedaudit()
    * @generated
    */
-  int UPDATEDAUDIT = 24;
+  int UPDATEDAUDIT = 26;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1890,7 +2045,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getClickSendSms()
    * @generated
    */
-  int CLICK_SEND_SMS = 25;
+  int CLICK_SEND_SMS = 27;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1963,7 +2118,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getSlackPUT()
    * @generated
    */
-  int SLACK_PUT = 26;
+  int SLACK_PUT = 28;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -2027,7 +2182,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getCopydata()
    * @generated
    */
-  int COPYDATA = 27;
+  int COPYDATA = 29;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -2091,7 +2246,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getWriteCsv()
    * @generated
    */
-  int WRITE_CSV = 28;
+  int WRITE_CSV = 30;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -2164,7 +2319,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getLoadCsv()
    * @generated
    */
-  int LOAD_CSV = 29;
+  int LOAD_CSV = 31;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -2237,7 +2392,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getTransform()
    * @generated
    */
-  int TRANSFORM = 30;
+  int TRANSFORM = 32;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -2292,7 +2447,7 @@ public interface DslPackage extends EPackage
    * @see in.handyman.dsl.impl.DslPackageImpl#getExpression()
    * @generated
    */
-  int EXPRESSION = 31;
+  int EXPRESSION = 33;
 
   /**
    * The feature id for the '<em><b>Lhs</b></em>' attribute.
@@ -2512,6 +2667,125 @@ public interface DslPackage extends EPackage
    * @generated
    */
   EReference getAction_Condition();
+
+  /**
+   * Returns the meta object for class '{@link in.handyman.dsl.ElasticFBCLead <em>Elastic FBC Lead</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for class '<em>Elastic FBC Lead</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead
+   * @generated
+   */
+  EClass getElasticFBCLead();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticFBCLead#getAccessToken <em>Access Token</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Access Token</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead#getAccessToken()
+   * @see #getElasticFBCLead()
+   * @generated
+   */
+  EAttribute getElasticFBCLead_AccessToken();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticFBCLead#getAppSecret <em>App Secret</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>App Secret</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead#getAppSecret()
+   * @see #getElasticFBCLead()
+   * @generated
+   */
+  EAttribute getElasticFBCLead_AppSecret();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticFBCLead#getAccountId <em>Account Id</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Account Id</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead#getAccountId()
+   * @see #getElasticFBCLead()
+   * @generated
+   */
+  EAttribute getElasticFBCLead_AccountId();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticFBCLead#getCampaignId <em>Campaign Id</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Campaign Id</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead#getCampaignId()
+   * @see #getElasticFBCLead()
+   * @generated
+   */
+  EAttribute getElasticFBCLead_CampaignId();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticFBCLead#getTarget <em>Target</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Target</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead#getTarget()
+   * @see #getElasticFBCLead()
+   * @generated
+   */
+  EAttribute getElasticFBCLead_Target();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticFBCLead#getValue <em>Value</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Value</em>'.
+   * @see in.handyman.dsl.ElasticFBCLead#getValue()
+   * @see #getElasticFBCLead()
+   * @generated
+   */
+  EAttribute getElasticFBCLead_Value();
+
+  /**
+   * Returns the meta object for class '{@link in.handyman.dsl.ElasticGET <em>Elastic GET</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for class '<em>Elastic GET</em>'.
+   * @see in.handyman.dsl.ElasticGET
+   * @generated
+   */
+  EClass getElasticGET();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticGET#getSource <em>Source</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Source</em>'.
+   * @see in.handyman.dsl.ElasticGET#getSource()
+   * @see #getElasticGET()
+   * @generated
+   */
+  EAttribute getElasticGET_Source();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticGET#getTo <em>To</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>To</em>'.
+   * @see in.handyman.dsl.ElasticGET#getTo()
+   * @see #getElasticGET()
+   * @generated
+   */
+  EAttribute getElasticGET_To();
+
+  /**
+   * Returns the meta object for the attribute '{@link in.handyman.dsl.ElasticGET#getValue <em>Value</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Value</em>'.
+   * @see in.handyman.dsl.ElasticGET#getValue()
+   * @see #getElasticGET()
+   * @generated
+   */
+  EAttribute getElasticGET_Value();
 
   /**
    * Returns the meta object for class '{@link in.handyman.dsl.ExecJava <em>Exec Java</em>}'.
@@ -4304,6 +4578,98 @@ public interface DslPackage extends EPackage
      * @generated
      */
     EReference ACTION__CONDITION = eINSTANCE.getAction_Condition();
+
+    /**
+     * The meta object literal for the '{@link in.handyman.dsl.impl.ElasticFBCLeadImpl <em>Elastic FBC Lead</em>}' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see in.handyman.dsl.impl.ElasticFBCLeadImpl
+     * @see in.handyman.dsl.impl.DslPackageImpl#getElasticFBCLead()
+     * @generated
+     */
+    EClass ELASTIC_FBC_LEAD = eINSTANCE.getElasticFBCLead();
+
+    /**
+     * The meta object literal for the '<em><b>Access Token</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_FBC_LEAD__ACCESS_TOKEN = eINSTANCE.getElasticFBCLead_AccessToken();
+
+    /**
+     * The meta object literal for the '<em><b>App Secret</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_FBC_LEAD__APP_SECRET = eINSTANCE.getElasticFBCLead_AppSecret();
+
+    /**
+     * The meta object literal for the '<em><b>Account Id</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_FBC_LEAD__ACCOUNT_ID = eINSTANCE.getElasticFBCLead_AccountId();
+
+    /**
+     * The meta object literal for the '<em><b>Campaign Id</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_FBC_LEAD__CAMPAIGN_ID = eINSTANCE.getElasticFBCLead_CampaignId();
+
+    /**
+     * The meta object literal for the '<em><b>Target</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_FBC_LEAD__TARGET = eINSTANCE.getElasticFBCLead_Target();
+
+    /**
+     * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_FBC_LEAD__VALUE = eINSTANCE.getElasticFBCLead_Value();
+
+    /**
+     * The meta object literal for the '{@link in.handyman.dsl.impl.ElasticGETImpl <em>Elastic GET</em>}' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see in.handyman.dsl.impl.ElasticGETImpl
+     * @see in.handyman.dsl.impl.DslPackageImpl#getElasticGET()
+     * @generated
+     */
+    EClass ELASTIC_GET = eINSTANCE.getElasticGET();
+
+    /**
+     * The meta object literal for the '<em><b>Source</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_GET__SOURCE = eINSTANCE.getElasticGET_Source();
+
+    /**
+     * The meta object literal for the '<em><b>To</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_GET__TO = eINSTANCE.getElasticGET_To();
+
+    /**
+     * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute ELASTIC_GET__VALUE = eINSTANCE.getElasticGET_Value();
 
     /**
      * The meta object literal for the '{@link in.handyman.dsl.impl.ExecJavaImpl <em>Exec Java</em>}' class.

@@ -236,6 +236,8 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cFirebaseReactiveNotificationParserRuleCall_22 = (RuleCall)cAlternatives.eContents().get(22);
 		private final RuleCall cFirebaseDatabasePutParserRuleCall_23 = (RuleCall)cAlternatives.eContents().get(23);
 		private final RuleCall cExecJavaParserRuleCall_24 = (RuleCall)cAlternatives.eContents().get(24);
+		private final RuleCall cElasticFBCLeadParserRuleCall_25 = (RuleCall)cAlternatives.eContents().get(25);
+		private final RuleCall cElasticGETParserRuleCall_26 = (RuleCall)cAlternatives.eContents().get(26);
 		
 		//Action:
 		//	Copydata
@@ -262,12 +264,15 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		//	| SmsLeadSms
 		//	| FirebaseReactiveNotification
 		//	| FirebaseDatabasePut
-		//	| ExecJava;
+		//	| ExecJava
+		//	| ElasticFBCLead
+		//	| ElasticGET;
 		@Override public ParserRule getRule() { return rule; }
 		
 		//Copydata | LoadCsv | WriteCsv | Transform | GooglecalPUT | SlackPUT | ClickSendSms | Updatedaudit | Callprocess | Fetch
 		//| TrelloPUT | TrelloGET | Rest | Doozle | Dropfile | FBCLead | FBFormDownload | SendMail | GooglecontactPUT |
-		//GooglecontactSelectAll | Abort | SmsLeadSms | FirebaseReactiveNotification | FirebaseDatabasePut | ExecJava
+		//GooglecontactSelectAll | Abort | SmsLeadSms | FirebaseReactiveNotification | FirebaseDatabasePut | ExecJava |
+		//ElasticFBCLead | ElasticGET
 		public Alternatives getAlternatives() { return cAlternatives; }
 		
 		//Copydata
@@ -344,6 +349,223 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		
 		//ExecJava
 		public RuleCall getExecJavaParserRuleCall_24() { return cExecJavaParserRuleCall_24; }
+		
+		//ElasticFBCLead
+		public RuleCall getElasticFBCLeadParserRuleCall_25() { return cElasticFBCLeadParserRuleCall_25; }
+		
+		//ElasticGET
+		public RuleCall getElasticGETParserRuleCall_26() { return cElasticGETParserRuleCall_26; }
+	}
+	public class ElasticFBCLeadElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "in.handyman.Dsl.ElasticFBCLead");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Keyword cEfblcKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Keyword cAsKeyword_1 = (Keyword)cGroup.eContents().get(1);
+		private final Assignment cNameAssignment_2 = (Assignment)cGroup.eContents().get(2);
+		private final RuleCall cNameSTRINGTerminalRuleCall_2_0 = (RuleCall)cNameAssignment_2.eContents().get(0);
+		private final Keyword cSecuredByKeyword_3 = (Keyword)cGroup.eContents().get(3);
+		private final Assignment cAccessTokenAssignment_4 = (Assignment)cGroup.eContents().get(4);
+		private final RuleCall cAccessTokenSTRINGTerminalRuleCall_4_0 = (RuleCall)cAccessTokenAssignment_4.eContents().get(0);
+		private final Keyword cWithKeyKeyword_5 = (Keyword)cGroup.eContents().get(5);
+		private final Assignment cAppSecretAssignment_6 = (Assignment)cGroup.eContents().get(6);
+		private final RuleCall cAppSecretSTRINGTerminalRuleCall_6_0 = (RuleCall)cAppSecretAssignment_6.eContents().get(0);
+		private final Keyword cThroughUserKeyword_7 = (Keyword)cGroup.eContents().get(7);
+		private final Assignment cAccountIdAssignment_8 = (Assignment)cGroup.eContents().get(8);
+		private final RuleCall cAccountIdSTRINGTerminalRuleCall_8_0 = (RuleCall)cAccountIdAssignment_8.eContents().get(0);
+		private final Keyword cForCampaignKeyword_9 = (Keyword)cGroup.eContents().get(9);
+		private final Assignment cCampaignIdAssignment_10 = (Assignment)cGroup.eContents().get(10);
+		private final RuleCall cCampaignIdSTRINGTerminalRuleCall_10_0 = (RuleCall)cCampaignIdAssignment_10.eContents().get(0);
+		private final Keyword cIntoKeyword_11 = (Keyword)cGroup.eContents().get(11);
+		private final Assignment cTargetAssignment_12 = (Assignment)cGroup.eContents().get(12);
+		private final RuleCall cTargetSTRINGTerminalRuleCall_12_0 = (RuleCall)cTargetAssignment_12.eContents().get(0);
+		private final Keyword cUsingKeyword_13 = (Keyword)cGroup.eContents().get(13);
+		private final Keyword cLeftCurlyBracketKeyword_14 = (Keyword)cGroup.eContents().get(14);
+		private final Assignment cValueAssignment_15 = (Assignment)cGroup.eContents().get(15);
+		private final RuleCall cValueSTRINGTerminalRuleCall_15_0 = (RuleCall)cValueAssignment_15.eContents().get(0);
+		private final Keyword cRightCurlyBracketKeyword_16 = (Keyword)cGroup.eContents().get(16);
+		private final Keyword cOnConditionKeyword_17 = (Keyword)cGroup.eContents().get(17);
+		private final Assignment cConditionAssignment_18 = (Assignment)cGroup.eContents().get(18);
+		private final RuleCall cConditionExpressionParserRuleCall_18_0 = (RuleCall)cConditionAssignment_18.eContents().get(0);
+		
+		//ElasticFBCLead:
+		//	'efblc' 'as' name=STRING 'secured-by' accessToken=STRING 'with-key' appSecret=STRING 'through-user' accountId=STRING
+		//	'for-campaign' campaignId=STRING 'into' target=STRING 'using'
+		//	'{'
+		//	value=STRING
+		//	'}' 'on-condition' condition=Expression;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//'efblc' 'as' name=STRING 'secured-by' accessToken=STRING 'with-key' appSecret=STRING 'through-user' accountId=STRING
+		//'for-campaign' campaignId=STRING 'into' target=STRING 'using' '{' value=STRING '}' 'on-condition' condition=Expression
+		public Group getGroup() { return cGroup; }
+		
+		//'efblc'
+		public Keyword getEfblcKeyword_0() { return cEfblcKeyword_0; }
+		
+		//'as'
+		public Keyword getAsKeyword_1() { return cAsKeyword_1; }
+		
+		//name=STRING
+		public Assignment getNameAssignment_2() { return cNameAssignment_2; }
+		
+		//STRING
+		public RuleCall getNameSTRINGTerminalRuleCall_2_0() { return cNameSTRINGTerminalRuleCall_2_0; }
+		
+		//'secured-by'
+		public Keyword getSecuredByKeyword_3() { return cSecuredByKeyword_3; }
+		
+		//accessToken=STRING
+		public Assignment getAccessTokenAssignment_4() { return cAccessTokenAssignment_4; }
+		
+		//STRING
+		public RuleCall getAccessTokenSTRINGTerminalRuleCall_4_0() { return cAccessTokenSTRINGTerminalRuleCall_4_0; }
+		
+		//'with-key'
+		public Keyword getWithKeyKeyword_5() { return cWithKeyKeyword_5; }
+		
+		//appSecret=STRING
+		public Assignment getAppSecretAssignment_6() { return cAppSecretAssignment_6; }
+		
+		//STRING
+		public RuleCall getAppSecretSTRINGTerminalRuleCall_6_0() { return cAppSecretSTRINGTerminalRuleCall_6_0; }
+		
+		//'through-user'
+		public Keyword getThroughUserKeyword_7() { return cThroughUserKeyword_7; }
+		
+		//accountId=STRING
+		public Assignment getAccountIdAssignment_8() { return cAccountIdAssignment_8; }
+		
+		//STRING
+		public RuleCall getAccountIdSTRINGTerminalRuleCall_8_0() { return cAccountIdSTRINGTerminalRuleCall_8_0; }
+		
+		//'for-campaign'
+		public Keyword getForCampaignKeyword_9() { return cForCampaignKeyword_9; }
+		
+		//campaignId=STRING
+		public Assignment getCampaignIdAssignment_10() { return cCampaignIdAssignment_10; }
+		
+		//STRING
+		public RuleCall getCampaignIdSTRINGTerminalRuleCall_10_0() { return cCampaignIdSTRINGTerminalRuleCall_10_0; }
+		
+		//'into'
+		public Keyword getIntoKeyword_11() { return cIntoKeyword_11; }
+		
+		//target=STRING
+		public Assignment getTargetAssignment_12() { return cTargetAssignment_12; }
+		
+		//STRING
+		public RuleCall getTargetSTRINGTerminalRuleCall_12_0() { return cTargetSTRINGTerminalRuleCall_12_0; }
+		
+		//'using'
+		public Keyword getUsingKeyword_13() { return cUsingKeyword_13; }
+		
+		//'{'
+		public Keyword getLeftCurlyBracketKeyword_14() { return cLeftCurlyBracketKeyword_14; }
+		
+		//value=STRING
+		public Assignment getValueAssignment_15() { return cValueAssignment_15; }
+		
+		//STRING
+		public RuleCall getValueSTRINGTerminalRuleCall_15_0() { return cValueSTRINGTerminalRuleCall_15_0; }
+		
+		//'}'
+		public Keyword getRightCurlyBracketKeyword_16() { return cRightCurlyBracketKeyword_16; }
+		
+		//'on-condition'
+		public Keyword getOnConditionKeyword_17() { return cOnConditionKeyword_17; }
+		
+		//condition=Expression
+		public Assignment getConditionAssignment_18() { return cConditionAssignment_18; }
+		
+		//Expression
+		public RuleCall getConditionExpressionParserRuleCall_18_0() { return cConditionExpressionParserRuleCall_18_0; }
+	}
+	public class ElasticGETElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "in.handyman.Dsl.ElasticGET");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Keyword cElasticgetKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Keyword cAsKeyword_1 = (Keyword)cGroup.eContents().get(1);
+		private final Assignment cNameAssignment_2 = (Assignment)cGroup.eContents().get(2);
+		private final RuleCall cNameSTRINGTerminalRuleCall_2_0 = (RuleCall)cNameAssignment_2.eContents().get(0);
+		private final Keyword cFromKeyword_3 = (Keyword)cGroup.eContents().get(3);
+		private final Assignment cSourceAssignment_4 = (Assignment)cGroup.eContents().get(4);
+		private final RuleCall cSourceSTRINGTerminalRuleCall_4_0 = (RuleCall)cSourceAssignment_4.eContents().get(0);
+		private final Keyword cToKeyword_5 = (Keyword)cGroup.eContents().get(5);
+		private final Assignment cToAssignment_6 = (Assignment)cGroup.eContents().get(6);
+		private final RuleCall cToSTRINGTerminalRuleCall_6_0 = (RuleCall)cToAssignment_6.eContents().get(0);
+		private final Keyword cUsingKeyword_7 = (Keyword)cGroup.eContents().get(7);
+		private final Keyword cLeftCurlyBracketKeyword_8 = (Keyword)cGroup.eContents().get(8);
+		private final Assignment cValueAssignment_9 = (Assignment)cGroup.eContents().get(9);
+		private final RuleCall cValueSelectStatementParserRuleCall_9_0 = (RuleCall)cValueAssignment_9.eContents().get(0);
+		private final Keyword cRightCurlyBracketKeyword_10 = (Keyword)cGroup.eContents().get(10);
+		private final Keyword cOnConditionKeyword_11 = (Keyword)cGroup.eContents().get(11);
+		private final Assignment cConditionAssignment_12 = (Assignment)cGroup.eContents().get(12);
+		private final RuleCall cConditionExpressionParserRuleCall_12_0 = (RuleCall)cConditionAssignment_12.eContents().get(0);
+		
+		//ElasticGET:
+		//	'elasticget' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'using'
+		//	'{'
+		//	value=SelectStatement
+		//	'}' 'on-condition' condition=Expression;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//'elasticget' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'using' '{' value=SelectStatement '}' 'on-condition'
+		//condition=Expression
+		public Group getGroup() { return cGroup; }
+		
+		//'elasticget'
+		public Keyword getElasticgetKeyword_0() { return cElasticgetKeyword_0; }
+		
+		//'as'
+		public Keyword getAsKeyword_1() { return cAsKeyword_1; }
+		
+		//name=STRING
+		public Assignment getNameAssignment_2() { return cNameAssignment_2; }
+		
+		//STRING
+		public RuleCall getNameSTRINGTerminalRuleCall_2_0() { return cNameSTRINGTerminalRuleCall_2_0; }
+		
+		//'from'
+		public Keyword getFromKeyword_3() { return cFromKeyword_3; }
+		
+		//source=STRING
+		public Assignment getSourceAssignment_4() { return cSourceAssignment_4; }
+		
+		//STRING
+		public RuleCall getSourceSTRINGTerminalRuleCall_4_0() { return cSourceSTRINGTerminalRuleCall_4_0; }
+		
+		//'to'
+		public Keyword getToKeyword_5() { return cToKeyword_5; }
+		
+		//to=STRING
+		public Assignment getToAssignment_6() { return cToAssignment_6; }
+		
+		//STRING
+		public RuleCall getToSTRINGTerminalRuleCall_6_0() { return cToSTRINGTerminalRuleCall_6_0; }
+		
+		//'using'
+		public Keyword getUsingKeyword_7() { return cUsingKeyword_7; }
+		
+		//'{'
+		public Keyword getLeftCurlyBracketKeyword_8() { return cLeftCurlyBracketKeyword_8; }
+		
+		//value=SelectStatement
+		public Assignment getValueAssignment_9() { return cValueAssignment_9; }
+		
+		//SelectStatement
+		public RuleCall getValueSelectStatementParserRuleCall_9_0() { return cValueSelectStatementParserRuleCall_9_0; }
+		
+		//'}'
+		public Keyword getRightCurlyBracketKeyword_10() { return cRightCurlyBracketKeyword_10; }
+		
+		//'on-condition'
+		public Keyword getOnConditionKeyword_11() { return cOnConditionKeyword_11; }
+		
+		//condition=Expression
+		public Assignment getConditionAssignment_12() { return cConditionAssignment_12; }
+		
+		//Expression
+		public RuleCall getConditionExpressionParserRuleCall_12_0() { return cConditionExpressionParserRuleCall_12_0; }
 	}
 	public class ExecJavaElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "in.handyman.Dsl.ExecJava");
@@ -3227,6 +3449,8 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 	private final FinallyElements pFinally;
 	private final CatchElements pCatch;
 	private final ActionElements pAction;
+	private final ElasticFBCLeadElements pElasticFBCLead;
+	private final ElasticGETElements pElasticGET;
 	private final ExecJavaElements pExecJava;
 	private final FirebaseDatabasePutElements pFirebaseDatabasePut;
 	private final FirebaseReactiveNotificationElements pFirebaseReactiveNotification;
@@ -3274,6 +3498,8 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		this.pFinally = new FinallyElements();
 		this.pCatch = new CatchElements();
 		this.pAction = new ActionElements();
+		this.pElasticFBCLead = new ElasticFBCLeadElements();
+		this.pElasticGET = new ElasticGETElements();
 		this.pExecJava = new ExecJavaElements();
 		this.pFirebaseDatabasePut = new FirebaseDatabasePutElements();
 		this.pFirebaseReactiveNotification = new FirebaseReactiveNotificationElements();
@@ -3414,13 +3640,42 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 	//	| SmsLeadSms
 	//	| FirebaseReactiveNotification
 	//	| FirebaseDatabasePut
-	//	| ExecJava;
+	//	| ExecJava
+	//	| ElasticFBCLead
+	//	| ElasticGET;
 	public ActionElements getActionAccess() {
 		return pAction;
 	}
 	
 	public ParserRule getActionRule() {
 		return getActionAccess().getRule();
+	}
+	
+	//ElasticFBCLead:
+	//	'efblc' 'as' name=STRING 'secured-by' accessToken=STRING 'with-key' appSecret=STRING 'through-user' accountId=STRING
+	//	'for-campaign' campaignId=STRING 'into' target=STRING 'using'
+	//	'{'
+	//	value=STRING
+	//	'}' 'on-condition' condition=Expression;
+	public ElasticFBCLeadElements getElasticFBCLeadAccess() {
+		return pElasticFBCLead;
+	}
+	
+	public ParserRule getElasticFBCLeadRule() {
+		return getElasticFBCLeadAccess().getRule();
+	}
+	
+	//ElasticGET:
+	//	'elasticget' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'using'
+	//	'{'
+	//	value=SelectStatement
+	//	'}' 'on-condition' condition=Expression;
+	public ElasticGETElements getElasticGETAccess() {
+		return pElasticGET;
+	}
+	
+	public ParserRule getElasticGETRule() {
+		return getElasticGETAccess().getRule();
 	}
 	
 	//ExecJava:

@@ -610,6 +610,375 @@ ruleAction returns [EObject current=null]
 			$current = $this_ExecJava_24.current;
 			afterParserOrEnumRuleCall();
 		}
+		    |
+		{
+			newCompositeNode(grammarAccess.getActionAccess().getElasticFBCLeadParserRuleCall_25());
+		}
+		this_ElasticFBCLead_25=ruleElasticFBCLead
+		{
+			$current = $this_ElasticFBCLead_25.current;
+			afterParserOrEnumRuleCall();
+		}
+		    |
+		{
+			newCompositeNode(grammarAccess.getActionAccess().getElasticGETParserRuleCall_26());
+		}
+		this_ElasticGET_26=ruleElasticGET
+		{
+			$current = $this_ElasticGET_26.current;
+			afterParserOrEnumRuleCall();
+		}
+	)
+;
+
+// Entry rule entryRuleElasticFBCLead
+entryRuleElasticFBCLead returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getElasticFBCLeadRule()); }
+	iv_ruleElasticFBCLead=ruleElasticFBCLead
+	{ $current=$iv_ruleElasticFBCLead.current; }
+	EOF;
+
+// Rule ElasticFBCLead
+ruleElasticFBCLead returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		otherlv_0='efblc'
+		{
+			newLeafNode(otherlv_0, grammarAccess.getElasticFBCLeadAccess().getEfblcKeyword_0());
+		}
+		otherlv_1='as'
+		{
+			newLeafNode(otherlv_1, grammarAccess.getElasticFBCLeadAccess().getAsKeyword_1());
+		}
+		(
+			(
+				lv_name_2_0=RULE_STRING
+				{
+					newLeafNode(lv_name_2_0, grammarAccess.getElasticFBCLeadAccess().getNameSTRINGTerminalRuleCall_2_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"name",
+						lv_name_2_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_3='secured-by'
+		{
+			newLeafNode(otherlv_3, grammarAccess.getElasticFBCLeadAccess().getSecuredByKeyword_3());
+		}
+		(
+			(
+				lv_accessToken_4_0=RULE_STRING
+				{
+					newLeafNode(lv_accessToken_4_0, grammarAccess.getElasticFBCLeadAccess().getAccessTokenSTRINGTerminalRuleCall_4_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"accessToken",
+						lv_accessToken_4_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_5='with-key'
+		{
+			newLeafNode(otherlv_5, grammarAccess.getElasticFBCLeadAccess().getWithKeyKeyword_5());
+		}
+		(
+			(
+				lv_appSecret_6_0=RULE_STRING
+				{
+					newLeafNode(lv_appSecret_6_0, grammarAccess.getElasticFBCLeadAccess().getAppSecretSTRINGTerminalRuleCall_6_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"appSecret",
+						lv_appSecret_6_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_7='through-user'
+		{
+			newLeafNode(otherlv_7, grammarAccess.getElasticFBCLeadAccess().getThroughUserKeyword_7());
+		}
+		(
+			(
+				lv_accountId_8_0=RULE_STRING
+				{
+					newLeafNode(lv_accountId_8_0, grammarAccess.getElasticFBCLeadAccess().getAccountIdSTRINGTerminalRuleCall_8_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"accountId",
+						lv_accountId_8_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_9='for-campaign'
+		{
+			newLeafNode(otherlv_9, grammarAccess.getElasticFBCLeadAccess().getForCampaignKeyword_9());
+		}
+		(
+			(
+				lv_campaignId_10_0=RULE_STRING
+				{
+					newLeafNode(lv_campaignId_10_0, grammarAccess.getElasticFBCLeadAccess().getCampaignIdSTRINGTerminalRuleCall_10_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"campaignId",
+						lv_campaignId_10_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_11='into'
+		{
+			newLeafNode(otherlv_11, grammarAccess.getElasticFBCLeadAccess().getIntoKeyword_11());
+		}
+		(
+			(
+				lv_target_12_0=RULE_STRING
+				{
+					newLeafNode(lv_target_12_0, grammarAccess.getElasticFBCLeadAccess().getTargetSTRINGTerminalRuleCall_12_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"target",
+						lv_target_12_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_13='using'
+		{
+			newLeafNode(otherlv_13, grammarAccess.getElasticFBCLeadAccess().getUsingKeyword_13());
+		}
+		otherlv_14='{'
+		{
+			newLeafNode(otherlv_14, grammarAccess.getElasticFBCLeadAccess().getLeftCurlyBracketKeyword_14());
+		}
+		(
+			(
+				lv_value_15_0=RULE_STRING
+				{
+					newLeafNode(lv_value_15_0, grammarAccess.getElasticFBCLeadAccess().getValueSTRINGTerminalRuleCall_15_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticFBCLeadRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"value",
+						lv_value_15_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_16='}'
+		{
+			newLeafNode(otherlv_16, grammarAccess.getElasticFBCLeadAccess().getRightCurlyBracketKeyword_16());
+		}
+		otherlv_17='on-condition'
+		{
+			newLeafNode(otherlv_17, grammarAccess.getElasticFBCLeadAccess().getOnConditionKeyword_17());
+		}
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getElasticFBCLeadAccess().getConditionExpressionParserRuleCall_18_0());
+				}
+				lv_condition_18_0=ruleExpression
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getElasticFBCLeadRule());
+					}
+					set(
+						$current,
+						"condition",
+						lv_condition_18_0,
+						"in.handyman.Dsl.Expression");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)
+	)
+;
+
+// Entry rule entryRuleElasticGET
+entryRuleElasticGET returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getElasticGETRule()); }
+	iv_ruleElasticGET=ruleElasticGET
+	{ $current=$iv_ruleElasticGET.current; }
+	EOF;
+
+// Rule ElasticGET
+ruleElasticGET returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		otherlv_0='elasticget'
+		{
+			newLeafNode(otherlv_0, grammarAccess.getElasticGETAccess().getElasticgetKeyword_0());
+		}
+		otherlv_1='as'
+		{
+			newLeafNode(otherlv_1, grammarAccess.getElasticGETAccess().getAsKeyword_1());
+		}
+		(
+			(
+				lv_name_2_0=RULE_STRING
+				{
+					newLeafNode(lv_name_2_0, grammarAccess.getElasticGETAccess().getNameSTRINGTerminalRuleCall_2_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticGETRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"name",
+						lv_name_2_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_3='from'
+		{
+			newLeafNode(otherlv_3, grammarAccess.getElasticGETAccess().getFromKeyword_3());
+		}
+		(
+			(
+				lv_source_4_0=RULE_STRING
+				{
+					newLeafNode(lv_source_4_0, grammarAccess.getElasticGETAccess().getSourceSTRINGTerminalRuleCall_4_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticGETRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"source",
+						lv_source_4_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_5='to'
+		{
+			newLeafNode(otherlv_5, grammarAccess.getElasticGETAccess().getToKeyword_5());
+		}
+		(
+			(
+				lv_to_6_0=RULE_STRING
+				{
+					newLeafNode(lv_to_6_0, grammarAccess.getElasticGETAccess().getToSTRINGTerminalRuleCall_6_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getElasticGETRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"to",
+						lv_to_6_0,
+						"org.eclipse.xtext.common.Terminals.STRING");
+				}
+			)
+		)
+		otherlv_7='using'
+		{
+			newLeafNode(otherlv_7, grammarAccess.getElasticGETAccess().getUsingKeyword_7());
+		}
+		otherlv_8='{'
+		{
+			newLeafNode(otherlv_8, grammarAccess.getElasticGETAccess().getLeftCurlyBracketKeyword_8());
+		}
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getElasticGETAccess().getValueSelectStatementParserRuleCall_9_0());
+				}
+				lv_value_9_0=ruleSelectStatement
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getElasticGETRule());
+					}
+					set(
+						$current,
+						"value",
+						lv_value_9_0,
+						"in.handyman.Dsl.SelectStatement");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)
+		otherlv_10='}'
+		{
+			newLeafNode(otherlv_10, grammarAccess.getElasticGETAccess().getRightCurlyBracketKeyword_10());
+		}
+		otherlv_11='on-condition'
+		{
+			newLeafNode(otherlv_11, grammarAccess.getElasticGETAccess().getOnConditionKeyword_11());
+		}
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getElasticGETAccess().getConditionExpressionParserRuleCall_12_0());
+				}
+				lv_condition_12_0=ruleExpression
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getElasticGETRule());
+					}
+					set(
+						$current,
+						"condition",
+						lv_condition_12_0,
+						"in.handyman.Dsl.Expression");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)
 	)
 ;
 

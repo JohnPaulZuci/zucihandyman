@@ -28,6 +28,19 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Action/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//Action/condition"/>
     </genClasses>
+    <genClasses ecoreClass="Dsl.ecore#//ElasticFBCLead">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticFBCLead/accessToken"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticFBCLead/appSecret"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticFBCLead/accountId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticFBCLead/campaignId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticFBCLead/target"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticFBCLead/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Dsl.ecore#//ElasticGET">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticGET/source"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticGET/to"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ElasticGET/value"/>
+    </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//ExecJava">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ExecJava/classFqn"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//ExecJava/dbSrc"/>

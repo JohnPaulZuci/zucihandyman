@@ -12,6 +12,8 @@ import in.handyman.dsl.Copydata;
 import in.handyman.dsl.Doozle;
 import in.handyman.dsl.Dropfile;
 import in.handyman.dsl.DslPackage;
+import in.handyman.dsl.ElasticFBCLead;
+import in.handyman.dsl.ElasticGET;
 import in.handyman.dsl.ExecJava;
 import in.handyman.dsl.Expression;
 import in.handyman.dsl.FBCLead;
@@ -136,6 +138,22 @@ public class DslSwitch<T> extends Switch<T>
       {
         Action action = (Action)theEObject;
         T result = caseAction(action);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case DslPackage.ELASTIC_FBC_LEAD:
+      {
+        ElasticFBCLead elasticFBCLead = (ElasticFBCLead)theEObject;
+        T result = caseElasticFBCLead(elasticFBCLead);
+        if (result == null) result = caseAction(elasticFBCLead);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
+      case DslPackage.ELASTIC_GET:
+      {
+        ElasticGET elasticGET = (ElasticGET)theEObject;
+        T result = caseElasticGET(elasticGET);
+        if (result == null) result = caseAction(elasticGET);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -433,6 +451,38 @@ public class DslSwitch<T> extends Switch<T>
    * @generated
    */
   public T caseAction(Action object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Elastic FBC Lead</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Elastic FBC Lead</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseElasticFBCLead(ElasticFBCLead object)
+  {
+    return null;
+  }
+
+  /**
+   * Returns the result of interpreting the object as an instance of '<em>Elastic GET</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Elastic GET</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseElasticGET(ElasticGET object)
   {
     return null;
   }

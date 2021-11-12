@@ -1,0 +1,24 @@
+process "assign.transform"
+{
+	try
+ 	{	
+	 	assign as "retrieveData" source "${sample}" using
+    		{
+      			"select name, age as age from UserDetails limit 1;"
+    		}   
+
+		transform as "updateData" on "${sample}" using
+    		{
+			"update UserDetails set name = 'process';"
+	 	}
+
+  	}
+    catch
+    {
+  
+    }
+    finally
+    {
+	    
+    }
+}

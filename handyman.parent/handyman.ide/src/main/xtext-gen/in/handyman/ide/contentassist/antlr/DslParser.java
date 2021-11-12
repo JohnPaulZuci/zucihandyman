@@ -37,6 +37,8 @@ public class DslParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getTryAccess().getGroup(), "rule__Try__Group__0");
 			builder.put(grammarAccess.getFinallyAccess().getGroup(), "rule__Finally__Group__0");
 			builder.put(grammarAccess.getCatchAccess().getGroup(), "rule__Catch__Group__0");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getGroup(), "rule__ElasticFBCLead__Group__0");
+			builder.put(grammarAccess.getElasticGETAccess().getGroup(), "rule__ElasticGET__Group__0");
 			builder.put(grammarAccess.getExecJavaAccess().getGroup(), "rule__ExecJava__Group__0");
 			builder.put(grammarAccess.getFirebaseDatabasePutAccess().getGroup(), "rule__FirebaseDatabasePut__Group__0");
 			builder.put(grammarAccess.getFirebaseReactiveNotificationAccess().getGroup(), "rule__FirebaseReactiveNotification__Group__0");
@@ -74,6 +76,19 @@ public class DslParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getFinallyAccess().getActionAssignment_3(), "rule__Finally__ActionAssignment_3");
 			builder.put(grammarAccess.getCatchAccess().getNameAssignment_1(), "rule__Catch__NameAssignment_1");
 			builder.put(grammarAccess.getCatchAccess().getActionAssignment_3(), "rule__Catch__ActionAssignment_3");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getNameAssignment_2(), "rule__ElasticFBCLead__NameAssignment_2");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getAccessTokenAssignment_4(), "rule__ElasticFBCLead__AccessTokenAssignment_4");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getAppSecretAssignment_6(), "rule__ElasticFBCLead__AppSecretAssignment_6");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getAccountIdAssignment_8(), "rule__ElasticFBCLead__AccountIdAssignment_8");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getCampaignIdAssignment_10(), "rule__ElasticFBCLead__CampaignIdAssignment_10");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getTargetAssignment_12(), "rule__ElasticFBCLead__TargetAssignment_12");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getValueAssignment_15(), "rule__ElasticFBCLead__ValueAssignment_15");
+			builder.put(grammarAccess.getElasticFBCLeadAccess().getConditionAssignment_18(), "rule__ElasticFBCLead__ConditionAssignment_18");
+			builder.put(grammarAccess.getElasticGETAccess().getNameAssignment_2(), "rule__ElasticGET__NameAssignment_2");
+			builder.put(grammarAccess.getElasticGETAccess().getSourceAssignment_4(), "rule__ElasticGET__SourceAssignment_4");
+			builder.put(grammarAccess.getElasticGETAccess().getToAssignment_6(), "rule__ElasticGET__ToAssignment_6");
+			builder.put(grammarAccess.getElasticGETAccess().getValueAssignment_9(), "rule__ElasticGET__ValueAssignment_9");
+			builder.put(grammarAccess.getElasticGETAccess().getConditionAssignment_12(), "rule__ElasticGET__ConditionAssignment_12");
 			builder.put(grammarAccess.getExecJavaAccess().getNameAssignment_2(), "rule__ExecJava__NameAssignment_2");
 			builder.put(grammarAccess.getExecJavaAccess().getClassFqnAssignment_4(), "rule__ExecJava__ClassFqnAssignment_4");
 			builder.put(grammarAccess.getExecJavaAccess().getDbSrcAssignment_6(), "rule__ExecJava__DbSrcAssignment_6");

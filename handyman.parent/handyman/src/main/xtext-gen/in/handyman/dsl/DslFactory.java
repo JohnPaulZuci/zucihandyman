@@ -69,6 +69,24 @@ public interface DslFactory extends EFactory
   Action createAction();
 
   /**
+   * Returns a new object of class '<em>Elastic FBC Lead</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Elastic FBC Lead</em>'.
+   * @generated
+   */
+  ElasticFBCLead createElasticFBCLead();
+
+  /**
+   * Returns a new object of class '<em>Elastic GET</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Elastic GET</em>'.
+   * @generated
+   */
+  ElasticGET createElasticGET();
+
+  /**
    * Returns a new object of class '<em>Exec Java</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->

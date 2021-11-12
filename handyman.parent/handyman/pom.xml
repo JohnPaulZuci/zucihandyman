@@ -19,7 +19,7 @@
 		<commons.text.version>1.1</commons.text.version>
 		<commons.httpclient.version>4.5.2</commons.httpclient.version>
 		<commons.asynchttpclient.version>4.1.2</commons.asynchttpclient.version>
-		<facebook.sdk.version>4.0.2</facebook.sdk.version>
+		<facebook.sdk.version>6.0.0</facebook.sdk.version>
 		<squareup.http.version>3.11.0</squareup.http.version>
 		<google.people.version>v1-rev224-1.23.0</google.people.version>
 		<google.cal.version>v3-rev87-1.19.0</google.cal.version>
@@ -238,6 +238,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.github.jsqlparser</groupId>
+			<artifactId>jsqlparser</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.knowm</groupId>
 			<artifactId>sundial</artifactId>
 			<version>2.2.0</version>
@@ -347,10 +352,15 @@
 			<artifactId>httpmime</artifactId>
 			<version>${commons.httpclient.version}</version>
 		</dependency>
+
+		<!-- <dependency> <groupId>com.facebook.business.sdk</groupId> <artifactId>facebook-java-business-sdk</artifactId> 
+			<version>${facebook.sdk.version}</version> </dependency> -->
+
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
 		<dependency>
-			<groupId>com.facebook.business.sdk</groupId>
-			<artifactId>facebook-java-business-sdk</artifactId>
-			<version>${facebook.sdk.version}</version>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 
 		<dependency>
@@ -360,33 +370,98 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-people</artifactId>
-			<version>${google.people.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-calendar</artifactId>
-			<version>${google.cal.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.restlet.jee</groupId>
 			<artifactId>org.restlet.ext.jackson</artifactId>
 			<version>${restlet.core.version}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
-			<groupId>com.sendgrid</groupId>
-			<artifactId>sendgrid-java</artifactId>
-			<version>4.3.0</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.sendgrid/java-http-client -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
 		<dependency>
-			<groupId>com.sendgrid</groupId>
-			<artifactId>java-http-client</artifactId>
-			<version>4.2.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>3.3</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-net/commons-net -->
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.6</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.18</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20200518</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.20</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-csv</artifactId>
+			<version>2.9.8</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/de.julielab/jcore-lingpipe-porterstemmer-ae -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>3.12.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>8.4.1.jre8</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.scalatest/scalatest -->
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.12</artifactId>
+			<version>3.2.7</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-jdbc</artifactId>
+			<version>3.1.2</version>
 		</dependency>
 
 	</dependencies>

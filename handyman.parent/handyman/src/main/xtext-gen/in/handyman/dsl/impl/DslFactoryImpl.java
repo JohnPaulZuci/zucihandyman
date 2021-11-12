@@ -13,6 +13,8 @@ import in.handyman.dsl.Doozle;
 import in.handyman.dsl.Dropfile;
 import in.handyman.dsl.DslFactory;
 import in.handyman.dsl.DslPackage;
+import in.handyman.dsl.ElasticFBCLead;
+import in.handyman.dsl.ElasticGET;
 import in.handyman.dsl.ExecJava;
 import in.handyman.dsl.Expression;
 import in.handyman.dsl.FBCLead;
@@ -102,6 +104,8 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
       case DslPackage.FINALLY: return createFinally();
       case DslPackage.CATCH: return createCatch();
       case DslPackage.ACTION: return createAction();
+      case DslPackage.ELASTIC_FBC_LEAD: return createElasticFBCLead();
+      case DslPackage.ELASTIC_GET: return createElasticGET();
       case DslPackage.EXEC_JAVA: return createExecJava();
       case DslPackage.FIREBASE_DATABASE_PUT: return createFirebaseDatabasePut();
       case DslPackage.FIREBASE_REACTIVE_NOTIFICATION: return createFirebaseReactiveNotification();
@@ -187,6 +191,28 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
   {
     ActionImpl action = new ActionImpl();
     return action;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ElasticFBCLead createElasticFBCLead()
+  {
+    ElasticFBCLeadImpl elasticFBCLead = new ElasticFBCLeadImpl();
+    return elasticFBCLead;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ElasticGET createElasticGET()
+  {
+    ElasticGETImpl elasticGET = new ElasticGETImpl();
+    return elasticGET;
   }
 
   /**
