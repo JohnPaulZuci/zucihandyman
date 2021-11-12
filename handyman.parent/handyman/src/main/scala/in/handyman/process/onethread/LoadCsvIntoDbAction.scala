@@ -7,6 +7,7 @@ import java.util.Date
 import java.util.logging.Level
 import java.util.logging.Logger
 
+
 import org.slf4j.MarkerFactory
 
 import com.opencsv.CSVReader
@@ -54,6 +55,7 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
     var iquery: String = ""
     var dquery: String = ""
     var ct: String = ""
+    
 
     logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db)
 
@@ -83,12 +85,14 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
           totalcount += 1
           values = values.replace("''", "'NULL'").replace("00:00:00.0", "")
           iquery = iquery + "('" + values + "),"
-
           if (count % limit == 0) {
             iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".csv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
             iquery = iquery.substring(0, iquery.length() - 1) + ";"
             logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db, iquery)
-            st.execute(iquery)
+            var builder = new StringBuilder(iquery);
+			      var firstPart : String  = builder.substring(0, builder.indexOf("VALUES", 0) + 6)// exception, "values" not found
+			      builder.delete(0, firstPart.trim().length());
+			      recursive(st, firstPart, builder.toString().trim());
             iquery = ""
             con.commit()
           }
@@ -96,8 +100,12 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
         iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".csv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
         iquery = iquery.substring(0, iquery.length() - 1) + ";"
         logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db, iquery)
-        st.execute(iquery)
+        var builder = new StringBuilder(iquery);
+			  var firstPart : String  = builder.substring(0, builder.indexOf("VALUES", 0) + 6)// exception, "values" not found
+			  builder.delete(0, firstPart.trim().length());
+			  recursive(st, firstPart, builder.toString().trim());
         con.commit()
+        
       } else if (fileName.contains(".tsv")) {
         val column: String = convertArrayToInsertLine(stoa, "`,`")
         ct = convertArrayToInsertLine(stoa, "`VARCHAR(344),`")
@@ -118,18 +126,24 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
           values = values.replace("''", "'NULL'").replace("00:00:00.0", "")
           iquery = iquery + "('" + values + "),"
           if (count % limit == 0) {
-            iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".tsv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
+            iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".csv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
             iquery = iquery.substring(0, iquery.length() - 1) + ";"
             logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db, iquery)
-            st.execute(iquery)
+            var builder = new StringBuilder(iquery);
+			      var firstPart : String  = builder.substring(0, builder.indexOf("VALUES", 0) + 6)// exception, "values" not found
+			      builder.delete(0, firstPart.trim().length());
+			      recursive(st, firstPart, builder.toString().trim());
             iquery = ""
             con.commit()
           }
         }
-        iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".tsv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
+        iquery = "INSERT IGNORE INTO  `" + pid + "_" + fileName.replace(".csv", "") + "`  (" + "`" + column + ")" + "VALUES " + iquery
         iquery = iquery.substring(0, iquery.length() - 1) + ";"
         logger.info("LoadCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, db, iquery)
-        st.execute(iquery)
+        var builder = new StringBuilder(iquery);
+			  var firstPart : String  = builder.substring(0, builder.indexOf("VALUES", 0) + 6)// exception, "values" not found
+			  builder.delete(0, firstPart.trim().length());
+			  recursive(st, firstPart, builder.toString().trim());
         con.commit()
       } else {
         logger.info("File format is invalid")
@@ -153,7 +167,7 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
         lgr.log(Level.WARNING, ex.getMessage, ex)
       }
     }
-    println(totalcount)
+    println("Total Row Count :" + totalcount)
     context
   }
 
@@ -187,5 +201,65 @@ class LoadCsvIntoDbAction extends in.handyman.command.Action with LazyLogging {
     detailMap
   }
   //target : String , source : String , auth : String , id :String, name: String, dropboxStmtfrom : Statement
+  
+  def recursive(st : Statement ,firstpart : String , iquery : String ) {
+
+		var split : Array[String] = iquery.toString().split("\\)\\,\\("); // check for over-written
+		var len : Int = split.length;
+
+		// Remove first occurrence of "("
+		var rmStr : String  = split(0).trim()
+		if (rmStr.startsWith("(")) {
+			split(0) = rmStr.substring(1, rmStr.length())
+		}
+		// Remove last occurrence of ";"
+		rmStr = split(len - 1).trim()
+		if (rmStr.endsWith(";")) {
+			split(len - 1) = rmStr.substring(0, rmStr.length() - 1)
+		}
+		// Remove last occurrence of ")"
+		rmStr = split(len - 1).trim()
+		if (rmStr.endsWith(")")) {
+			split(len - 1) = rmStr.substring(0, rmStr.length() - 1)
+		}
+
+		if (isDivideAndInsertSuccess(st, firstpart, iquery) == false) {
+			if (len <= 1) {
+				logger.info("Discrepancy row string is ::" + split(0))
+				return
+			} else {
+				recursive(st, firstpart, buildString(split, 0, len / 2));
+				recursive(st, firstpart, buildString(split, len / 2, len));
+			}
+		}
+	}
+  
+  def buildString(inStrArr : Array[String], startIndex : Int , endIndex : Int ) : String = {
+		var builder = new StringBuilder()
+		var i :  Int = 0
+		for (i <- startIndex until endIndex) {
+			builder.append("(").append(inStrArr(i)).append("),")
+			 
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		logger.info("With errored rows are ::  " + builder.toString())
+	  builder.toString();
+	}
+  
+  	def isDivideAndInsertSuccess(st : Statement, firstpart : String , iquery : String ) : Boolean = {
+		var success : Boolean = true
+		try {
+			var concat : String = firstpart+iquery
+			logger.info("Inserting string :"+ concat)
+			st.execute(concat)
+			return success
+		} catch {
+		  case e : SQLException =>
+		    return false
+		  case e : Exception  => 
+		    return false
+		}
+	}
+
 
 }
