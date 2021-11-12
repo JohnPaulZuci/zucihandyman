@@ -19,7 +19,7 @@ object CommandFactory {
       case "deletefolder" => new DeleteFolderAction
       case "copydata" => new CopydataAction
       case "terminal" => new TerminalAction
-      case "writecsv" => new WriteCsvAndTsvAction
+      case "writecsv" => new WriteCsvAction
       case "mongo2db" => new Mongo2DbAction
       case "ftp" => new FTPAction
       case "zip" => new ZipAction

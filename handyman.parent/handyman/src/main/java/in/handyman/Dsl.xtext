@@ -130,7 +130,8 @@ Copydata:
 	'}'  'on-condition' condition=Expression;
 
 WriteCsv:
-	'writecsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'using'
+	'writecsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'fielding' writeThreadCount=STRING 'with-fetch-batch-size' 
+	fetchBatchSize=STRING 'with-write-batch-size' writeBatchSize=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
