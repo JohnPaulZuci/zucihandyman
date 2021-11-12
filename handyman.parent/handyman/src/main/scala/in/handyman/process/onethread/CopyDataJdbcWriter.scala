@@ -34,13 +34,13 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
     c
   }
 
-  val writeSize = {
-    if (!copyData.getWriteBatchSize.isEmpty && copyData.getWriteBatchSize.toInt > 0)
-      copyData.getWriteBatchSize.toInt
-    else {
-      configMap.getOrElse(Constants.WRITESIZE, Constants.DEFAULT_WRITE_SIZE).toInt
-    }
-  }
+//  val writeSize = {
+//    if (!copyData.getWriteBatchSize.isEmpty && copyData.getWriteBatchSize.toInt > 0)
+//      copyData.getWriteBatchSize.toInt
+//    else {
+//      configMap.getOrElse(Constants.WRITESIZE, Constants.DEFAULT_WRITE_SIZE).toInt
+//    }
+//  }
 
   val columnList = {
     val colListBuilder = new StringBuilder
@@ -72,11 +72,11 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
         } else {
           val dataFrame = generateDataFrame(row)
           writeBuffer.add(dataFrame)
-          if (writeBuffer.size % writeSize == 0) {
-            val wriBuffSize = writeBuffer.size.toString()
-            logger.info(s"CopydataWriter(Before poison pill) flushing to database rows:$wriBuffSize")
-            writeToDb
-          }
+//          if (writeBuffer.size % writeSize == 0) {
+//            val wriBuffSize = writeBuffer.size.toString()
+//            logger.info(s"CopydataWriter(Before poison pill) flushing to database rows:$wriBuffSize")
+//            writeToDb
+//          }
         }
       }
     }

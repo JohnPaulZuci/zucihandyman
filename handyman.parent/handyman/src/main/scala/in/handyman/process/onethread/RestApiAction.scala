@@ -69,7 +69,7 @@ class RestApiAction extends in.handyman.command.Action with LazyLogging {
       var content = ""
       if (entity != null) {
         val inputStream = entity.getContent()
-        content = io.Source.fromInputStream(inputStream).getLines.mkString
+        content = scala.io.Source.fromInputStream(inputStream).getLines.mkString
         inputStream.close
       }
       logger.info("Rest Api Response Content: " + content + " for URL: " + restApi.getUrl)
@@ -113,7 +113,7 @@ class RestApiAction extends in.handyman.command.Action with LazyLogging {
       var content = ""
       if (entity != null) {
         val inputStream = entity.getContent()
-        content = io.Source.fromInputStream(inputStream).getLines.mkString
+        content = scala.io.Source.fromInputStream(inputStream).getLines.mkString
         inputStream.close
       }
       logger.info("Rest Api Response Content: " + content + " for URL: " + restApi.getUrl)
