@@ -9,7 +9,8 @@ object ParameterisationEngine {
     val configMap = context.getMe
     val paramEngine = new StrSubstitutor(configMap)
     if (inputString != null) {
-      val output = paramEngine.replace(inputString).replace("0_", configMap.getOrDefault("process-id", "0_") + "_")
+      val output = paramEngine.replace(inputString)
+        //.replace("0_", configMap.getOrDefault("process-id", "0_") + "_")
       output
     } else
       ""

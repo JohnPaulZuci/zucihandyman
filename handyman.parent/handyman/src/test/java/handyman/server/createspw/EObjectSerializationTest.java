@@ -20,8 +20,6 @@ import com.google.inject.Injector;
 
 import in.handyman.DslStandaloneSetup;
 import in.handyman.dsl.Action;
-import in.handyman.dsl.Expression;
-import in.handyman.dsl.Process;
 import in.handyman.parser.antlr.DslParser;
 
 public class EObjectSerializationTest {
@@ -118,6 +116,7 @@ public class EObjectSerializationTest {
 		finallyActions.add(transformImpl3);
 
 		Serializer serializer = guiceInjector.getInstance(Serializer.class);
+		@SuppressWarnings("deprecation")
 		SaveOptions saveOptions = SaveOptions.newBuilder().noValidation().getOptions();
 		String s = serializer.serialize(processImpl, saveOptions);
 		System.out.println(s);

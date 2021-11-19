@@ -58,11 +58,41 @@ class CopydataAction extends in.handyman.command.Action with LazyLogging {
 
     }
 
+
     val target = {
       if (copydata.getTo.trim.isEmpty()) {
         throw new HandymanException("target data source cannot be empty for copydata for " + name)
       }
       copydata.getTo.trim
+
+    column = column.substring(0, column.length() - 1)
+
+    var query: String = ""
+    var j: Int = 0
+    try {
+
+      while (rs.next()) {
+        val i: Int = 0
+        query = query + "("
+        for (i <- 1 to cols) {
+
+          var str: String = rs.getString(i)
+          if (str != null)
+            str = str.replaceAll("[^a-zA-Z0-9-:.]", " ")
+          query = query + "\"" + str + "\"" + ","
+
+        }
+
+        query = query.substring(0, query.length() - 1) + "),"
+
+        if (j % limit == 0) {
+
+          query = query.replace("\"null\"", "null")
+          logger.info("WriteCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, source, query)
+
+          var insert: String = "insert ignore into " + table + " (" + column + ")" + " values " + query.substring(0, query.length() - 1) + ";"
+          logger.info("WriteCsv id#{}, name#{}, from#{}, sqlList#{}", id, name, source, insert)
+        }
 
     }
 
@@ -256,5 +286,4 @@ class CopydataAction extends in.handyman.command.Action with LazyLogging {
   def generateAudit(): java.util.Map[String, String] = {
     detailMap
   }
-
 }

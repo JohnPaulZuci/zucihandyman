@@ -11,13 +11,13 @@ Process:
 	'}';
 
 Try:
-	'try' 
+	'try'
 	'{'
 	(action+=Action)*
 	'}';
 
 Finally:
-	'finally' 
+	'finally'
 	'{'
 	(action+=Action)*
 	'}';
@@ -33,85 +33,48 @@ Action:
 	| LoadCsv
 	| WriteCsv
 	| Transform
-	| GooglecalPUT
-	| SlackPUT
-	| ClickSendSms
-	| Updatedaudit
 	| Callprocess
 	| Forkprocess
 	| Fetch
-	| TrelloPUT
-	| TrelloGET
-	| Rest
 	| Doozle
 	| Dropfile
-	| FBCLead
-	| FBFormDownload
-	| SendMail
-	| GooglecontactPUT
-	| GooglecontactSelectAll
 	| Abort
-	| SmsLeadSms
-	| FirebaseReactiveNotification
-	| FirebaseDatabasePut
 	| ExecJava
-	| ElasticFBCLead
-	| ElasticGET
-	| Dropbox
-	| S3
-	| Extract
-	| Checksum
 	| DeleteFolder
-	| Mail
-	| TarGeneration
-	| ModelGeneration
-	| Mahout
 	| Terminal
 	| NLPTextPreprocessing
 	| DropboxCleanup
-	| Mongo2Db);
+	| SendEMail
+	| Mongo2Db
+	| FTP
+	| Unzip
+	| Zip
+	| Checksum
+	| JsonTransform
+	| RestApi
+	| Python
+	| Rest
+	| JsonDeserialize
+	| ListFiles
+	| DeleteSql
+	| UpdateSql
+	| InsertSql
+	| TruncateSql
+	| DropSql
+	);
+
+SendEMail:
+	'sendemail' 'as' name=STRING 'db' source=STRING 'smtp-host' smtphost=STRING 'smtp-port' smtpport=STRING
+	'from' from=STRING 'pass' pass=STRING 'to' to=STRING 'cc' cc=STRING
+	'bcc' bcc=STRING 'subject' subject=STRING 'body' body=STRING 'signature' signature=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
 
 DeleteFolder:
 	'deletefolder' 'as' name=STRING 'folder' foldersource=STRING 'zipfile' zipsource=STRING
 	'{'
 	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-DropboxCleanup:
-	'dropboxcleanup' 'as' name=STRING 'auth' auth=STRING 'type' type=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-Mail:
-	'mail' 'as' name=STRING 'db' source=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-NLPTextPreprocessing:
-	'nlptextpreprocessing' 'as' name=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-TarGeneration:
-	'targeneration' 'as' name=STRING 'from' source=STRING 'audit' auditVal=STRING 'process_id' process_id=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-ModelGeneration:
-	'modelgeneration' 'as' name=STRING 'from' source=STRING 'audit' auditVal=STRING 'process_id' process_id=STRING
-	'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-Mahout:
-	'mahout' 'as' name=STRING 'id' id=STRING 'using'
-	'{'
-	value=STRING
 	'}' 'on-condition' condition=Expression;
 
 Terminal:
@@ -120,117 +83,14 @@ Terminal:
 	value=STRING
 	'}' 'on-condition' condition=Expression;
 
-Extract:
-	'extract' 'as' name=STRING 'db' db=STRING 'sdirectory' sdirectory=STRING 'ddirectory' ddirectory=STRING 'file'
-	file=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-Checksum:
-	'checksum' 'as' name=STRING 'db' db=STRING 'cstype' cstype=STRING
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-Dropbox:
-	'dropbox' 'as' name=STRING 'db' db=STRING 'auth' auth=STRING 'source' source=STRING 'target' target=STRING 'type'
-	type=STRING 'by-batch' limit=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-S3:
-	's3' 'as' name=STRING 'db' db=STRING 'key' key=STRING 'token' token=STRING 'bucket' bucket=STRING 'type' type=STRING
-	'by-batch' limit=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-ElasticFBCLead:
-	'efblc' 'as' name=STRING 'secured-by' accessToken=STRING 'with-key' appSecret=STRING 'through-user' accountId=STRING
-	'for-campaign' campaignId=STRING 'into' target=STRING 'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-ElasticGET:
-	'elasticget' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
 ExecJava:
 	"java" 'as' name=STRING 'using' classFqn=STRING 'name-sake-db' dbSrc=STRING
 	'{'
 	value=STRING
 	'}' 'on-condition' condition=Expression;
 
-FirebaseDatabasePut:
-	'fbdp' 'as' name=STRING 'on' url=STRING 'auth-by' fbjson=STRING 'for-group' groupPath=STRING 'from-source'
-	dbSrc=STRING 'with-class' classFqn=STRING 'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-FirebaseReactiveNotification:
-	'fbrn' 'as' name=STRING 'on' url=STRING 'auth-by' fbjson=STRING 'for-group' groupPath=STRING 'with-class'
-	classFqn=STRING 'using' dbSrc=STRING 'on-condition' condition=Expression;
-
-SmsLeadSms:
-	'smsleadssms' 'as' name=STRING 'on' url=STRING 'with-sender' sender=STRING 'through-account' account=STRING
-	'secured-by' privateKey=STRING 'from-source' dbSrc=STRING 'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression 'do-dryrun-with' dryrunNumber=STRING;
-
 Abort:
 	'abort' 'as' name=STRING
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-GooglecontactSelectAll:
-	'gcontact-fetchall' 'as' name=STRING 'through-account' account=STRING 'secured-by' privateKey=STRING 'with-key'
-	ptwelveFile=STRING 'for-project' project=STRING 'on-behalf-of' impersonatedUser=STRING 'to-target' dbSrc=STRING
-	'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-SendMail:
-	'sendmail' 'as' name=STRING 'secured-by' privateKey=STRING 'on-behalf-of' impersonatedUser=STRING 'from-source'
-	dbSrc=STRING 'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression 'do-dryrun-with' dryrunMail=STRING;
-
-GooglecontactPUT:
-	'gcontact' 'as' name=STRING 'through-account' account=STRING 'secured-by' privateKey=STRING 'with-key'
-	ptwelveFile=STRING 'for-project' project=STRING 'on-behalf-of' impersonatedUser=STRING 'from-source' dbSrc=STRING
-	'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-GooglecalPUT:
-	'gcalendar' 'as' name=STRING 'through-account' account=STRING 'secured-by' privateKey=STRING 'with-key'
-	ptwelveFile=STRING 'for-project' project=STRING 'on-behalf-of' impersonatedUser=STRING 'from-source' dbSrc=STRING
-	'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-FBCLead:
-	'fblc' 'as' name=STRING 'secured-by' accessToken=STRING 'with-key' appSecret=STRING 'through-user' accountId=STRING
-	'for-campaign' campaignId=STRING 'into' target=STRING 'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-FBFormDownload:
-	'fbfd' 'as' name=STRING 'secured-by' accessToken=STRING 'with-key' appSecret=STRING 'through-user' accountId=STRING
-	'for-form' formId=STRING 'into' target=STRING 'using'
 	'{'
 	value=STRING
 	'}' 'on-condition' condition=Expression;
@@ -242,41 +102,6 @@ Doozle:
 	'doozle' 'as' name=STRING 'in-table' target=STRING 'on' on=STRING 'using'
 	'{'
 	value=CreateStatement
-	'}' 'on-condition' condition=Expression;
-
-Rest:
-	'rest' 'as' name=STRING 'secured-by' authtoken=STRING 'with-url' url=STRING 'and-method-as' method=STRING
-	'{'
-	'from' resourcedatafrom=STRING 'update-url-with' '{'
-	urldata=SelectStatement
-	'}'
-	'from' headerdatafrom=STRING 'update-header-with' '{'
-	headerdata=SelectStatement
-	'}'
-	'from' postdatafrom=STRING 'update-body-with' '{'
-	'parent' 'as' parentName=STRING parentdata=SelectStatement
-	parts+=(RestPart)*
-	'}'
-	'into' ackdatato=STRING 'store-ack-at' '{'
-	ackdata=SelectStatement
-	'}'
-	'}' 'on-condition' condition=Expression;
-
-RestPart:
-	'part' 'as' partName=STRING 'with' partData=SelectStatement;
-
-TrelloGET:
-	'trelloget' 'as' name=STRING 'secured-by' authtoken=STRING 'with-key' key=STRING 'through-user' useraccount=STRING
-	'from-board' board=STRING 'to' target=STRING 'using'
-	'{'
-	value=SelectStatement
-	'}' 'on-condition' condition=Expression;
-
-TrelloPUT:
-	'trelloput' 'as' name=STRING 'secured-by' authtoken=STRING 'with-key' key=STRING 'through-user' useraccount=STRING
-	'for-list' list=STRING 'from-source' source=STRING 'using'
-	'{'
-	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
 Fetch:
@@ -291,6 +116,99 @@ Callprocess:
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
+
+Forkprocess:
+	'forkprocess' 'as' name=STRING 'with-target' target=STRING 'from-file' source=STRING 'using' datasource=STRING
+	'for-every'
+	'{'
+	value=SelectStatement
+	'}' 'watermark' forkBatchSize=STRING 'on-condition' condition=Expression;
+
+Copydata:
+	'copydata' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'target' target=STRING 'by-batch' limit=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}'  'on-condition' condition=Expression;
+
+WriteCsv:
+	'writecsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'fielding' writeThreadCount=STRING 'with-fetch-batch-size' 
+	fetchBatchSize=STRING 'with-write-batch-size' writeBatchSize=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+LoadCsv:
+	'loadcsv' 'as' name=STRING 'pid' pid=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'by-batch'
+	limit=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+Transform:
+	'transform' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+
+DeleteSql:
+	'deletesql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+UpdateSql:
+	'updatesql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+InsertSql:
+	'insertsql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+TruncateSql:
+	'truncatesql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+DropSql:
+	'dropsql' 'as' name=STRING 'on' on=STRING 'using'
+	'{'
+	value+=NonSelectStatement
+	'}' 'on-condition' condition=Expression;
+
+ListFiles:
+	'listfiles' 'as' name=STRING 'from' source=STRING 'on' to=STRING 'target-table' targetTable=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+Mongo2Db:
+	'mongo2db' 'as' name=STRING 'from' sourceConnStr=STRING 'to' to=STRING 'srcDb' sourceDb=STRING 'targetDb'
+	targetDb=STRING 'targetTable' targetTable=STRING
+	'by-filter' filter=STRING 'by-batch' limit=STRING 'find-attribute' findAttr=STRING 'apply-manipulation'
+	applyManipulation=STRING
+	'on-updatekey' onUpdateKey=STRING 'with-fetch-batch-size' fetchBatchSize=STRING 'with-write-batch-size'
+	writeBatchSize=STRING
+	'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+FTP:
+	'ftp' 'as' name=STRING 'host' host=STRING 'port' port=STRING 'username' username=STRING 'password' password=STRING
+	'action' action=STRING 'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING
+	'remote-file'
+	remoteFile=STRING 'from' source=STRING 'target-table' targetTable=STRING 'using'
+	'{'
+	value=STRING
+	'}' 'on-condition' condition=Expression;
+
+Zip:
+	'zip' 'as' name=STRING 'zip-file-path' zipFilePath=STRING 'zip-file-name' zipFileName=STRING 'source' source=STRING
+	'buffer-size' bufferSize=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
 	
 Forkprocess:
     'forkprocess' 'as' name=STRING 'with-target' target=STRING 'from-file' source=STRING 'using' datasource=STRING
@@ -299,49 +217,55 @@ Forkprocess:
     value=SelectStatement
     '}' 'watermark' forkBatchSize=STRING 'on-condition' condition=Expression;
 
-Updatedaudit:
-	'log' 'as' name=STRING 'logto' logsink=STRING 'in' datasource=STRING 'using'
+Unzip:
+	'unzip' 'as' name=STRING 'source' source=STRING 'dest-dir' destDir=STRING 'buffer-size' bufferSize=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
-ClickSendSms:
-	'c2sms' 'as' name=STRING 'with-user' userid=STRING 'secured-by' securityKey=STRING 'from-source' target=STRING
-	'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-SlackPUT:
-	'slackput' 'as' name=STRING 'to' team=STRING 'on' channel=STRING 'using'
-	'{'
-	value=STRING
-	'}' 'on-condition' condition=Expression;
-
-Copydata:
-	'copydata' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'target' target=STRING 'by-batch' limit=STRING
-	'using'
+Checksum:
+	'checksum' 'as' name=STRING 'host' host=STRING 'port' port=STRING 'username' username=STRING 'password'
+	password=STRING
+	'local-dir' localDir=STRING 'local-file' localFile=STRING 'remote-dir' remoteDir=STRING 'remote-file'
+	remoteFile=STRING 'using'
 	'{'
 	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+
+JsonTransform:
+	'jsontransform' 'as' name=STRING 'from' source=STRING 'target-table' targetTable=STRING 'using'
+	'{'
+	value=SelectStatement
+	'}' 'on-condition' condition=Expression;
+JsonDeserialize:
+	'jsondeserialize' 'as' name=STRING 'from' source=STRING 'target-table' targetTable=STRING 'input' input=STRING 'using'
+	'{'
+	value=SelectStatement
+
 	'}' 'on-condition' condition=Expression 'fielding' writeThreadCount=STRING 'with-fetch-batch-size' fetchBatchSize=STRING 'with-write-batch-size' writeBatchSize=STRING;
 	
 WriteCsv:
 	'writecsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'using'
+
+	'}' 'on-condition' condition=Expression;
+RestApi:
+	'restapi' 'as' name=STRING 'url' url=STRING 'method' method=STRING 'property' property=STRING 'payload'
+	payload=STRING
+	'from' source=STRING 'target-table' targetTable=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
-LoadCsv:
-	'loadcsv' 'as' name=STRING 'from' source=STRING 'to' to=STRING 'with' delim=STRING 'by-batch' limit=STRING
-	'dbschema'
-	dbschema=STRING 'using'
+Python:
+	'python' 'as' name=STRING 'from' source=STRING 'target' target=STRING 'using'
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
 
-Transform:
-	'transform' 'as' name=STRING 'on' on=STRING 'using'
+Rest:
+	'rest' 'as' name=STRING 'secured-by' authtoken=STRING 'with-url' url=STRING 'and-method-as' method=STRING
 	'{'
+
 	value+=NonSelectStatement
 	'}' 'on-condition' condition=Expression;
 	
@@ -353,6 +277,26 @@ Mongo2Db:
 	'{'
 	value=SelectStatement
 	'}' 'on-condition' condition=Expression;
+
+		'from' resourcedatafrom=STRING 'update-url-with' '{'
+				urldata=SelectStatement
+		'}'
+		'from' headerdatafrom=STRING 'update-header-with' '{'
+				headerdata=SelectStatement  
+			'}'
+		'from' postdatafrom=STRING 'update-body-with' '{'
+				'parent' 'as' parentName=STRING parentdata=SelectStatement 
+				parts+=(RestPart)*
+		'}'
+		'into' ackdatato=STRING 'store-ack-at' '{'
+				ackdata=SelectStatement 
+		'}'
+	'}' 'on-condition' condition=Expression
+;
+
+RestPart:
+	'part' 'as' partName=STRING 'with' partData=SelectStatement
+; 
 
 Column:
 	STRING;

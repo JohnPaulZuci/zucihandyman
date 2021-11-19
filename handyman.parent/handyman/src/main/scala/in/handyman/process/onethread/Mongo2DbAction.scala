@@ -25,10 +25,11 @@ import com.typesafe.scalalogging.LazyLogging
 import in.handyman.command.CommandProxy
 import in.handyman.config.ConfigurationService
 import in.handyman.config.Resource
-import in.handyman.util.ExceptionUtil
 import in.handyman.util.ParameterisationEngine
 import in.handyman.util.ResourceAccess
-
+import com.mongodb.BasicDBList
+import java.util.ArrayList
+import in.handyman.util.ExceptionUtil
 
 class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
   val detailMap = new java.util.HashMap[String, String]
@@ -127,8 +128,6 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
               insert = "insert into " + table + " (" + insertFields + ")" + " values " + query.substring(0, query.length() - 1) + ";"
             }
             logger.info("Mongodbsql (Nqne) id#{}, name#{}, from#{}, rows#{}", id, name, source, rowsProcessed.toString)
-
-            //System.out.println(insert)
             mongo2DbStmtto.execute(insert)
 
             mongo2DbDbConnto.commit()
@@ -299,6 +298,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
           colValObj.forEach(colValO => colValStr = colValStr + colValO.toString() + "|")
           queryAppend = queryAppend + "\'" + colValStr.substring(0, colValStr.length()-1) + "\'" + ","*/
           queryAppend = queryAppend + "\'" + jsonArray.toString() + "\'" + ","
+
         } else {
           queryAppend = queryAppend + null + ","
         }
@@ -340,11 +340,8 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       val obje: Object = docObj.get(dbColForm)
       if (obje.isInstanceOf[java.util.ArrayList[Document]]) {
         val obje1 = obje.asInstanceOf[java.util.ArrayList[Document]]
-        if(obje1!=null && !obje1.isEmpty()){
-          /*val gson : Gson = new Gson();
-          return gson.toJson(obje1);*/
-          return obje1.get(0);
-        }
+        if(obje1!=null && !obje1.isEmpty())
+        return obje1.get(0)
         else
           return null;
       } else if (obje.isInstanceOf[java.util.ArrayList[_]]) {
@@ -406,6 +403,7 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       val colType: String = String.valueOf(jsonObj.get("type"))
       val colFormat: String = String.valueOf(jsonObj.get("format"))
       val logicalOperator: String = String.valueOf(jsonObj.get("logical-operator"))
+
 
       val condArr: JSONArray = new JSONArray(String.valueOf(jsonObj.get("condition")));
       for (j <- 0 to condArr.length() - 1) {

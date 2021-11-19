@@ -1,15 +1,20 @@
 package in.handyman.process.onethread
 
-import in.handyman.dsl._
-import in.handyman.server.ProcessRuntime
-import com.typesafe.scalalogging.LazyLogging
-import com.fasterxml.jackson.databind.ObjectMapper
-import in.handyman.command._
-import in.handyman.server.ProcessResponse
-import in.handyman.AbortException
-import com.fasterxml.jackson.databind.SerializationFeature
-import org.slf4j.MarkerFactory
 import java.util.Objects
+
+import org.slf4j.MarkerFactory
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.command.Context
+import in.handyman.command.ErrorContext
+import in.handyman.command.FinallyContext
+import in.handyman.command.TryContext
+import in.handyman.dsl.Catch
+import in.handyman.dsl.Finally
+import in.handyman.server.ProcessResponse
+import in.handyman.server.ProcessRuntime
 
 class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with LazyLogging {
   val jsonSerializer = new ObjectMapper
@@ -60,7 +65,6 @@ class UniThreadProcessRuntime(name: String, id: Int) extends ProcessRuntime with
   @throws(classOf[Exception])
   def executeChain(actionList: org.eclipse.emf.common.util.EList[in.handyman.dsl.Action], context: Context): java.util.HashMap[String, java.util.Map[String, String]] =
     {
-
       val iterator = actionList.iterator
       val detailMap: java.util.HashMap[String, java.util.Map[String, String]] = new java.util.HashMap[String, java.util.Map[String, String]]
       while (iterator.hasNext) {

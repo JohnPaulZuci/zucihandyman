@@ -1,139 +1,132 @@
 package in.handyman.process.onethread
 
-import com.typesafe.scalalogging.LazyLogging
-import in.handyman.command.Context
-import scala.collection.JavaConversions._
-import in.handyman.command.Action
-import in.handyman.command.CommandProxy
-import in.handyman.util.ResourceAccess
-import org.eclipse.emf.common.util.EList
-import in.handyman.util.ParameterisationEngine
-import java.util.ArrayList
-import java.sql.SQLException
-import scala.util.control.Exception.Finally
-import java.io.{ BufferedReader, FileOutputStream, InputStreamReader }
+import java.io.File
+import java.io.FileInputStream
+import java.security.MessageDigest
+
 import org.slf4j.MarkerFactory
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.AmazonClientException
-import com.amazonaws.AmazonServiceException
-import java.io.File
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.FileOutputStream
-import org.apache.commons.io.IOUtils
-import scala.util.Try
 
-import java.io.File
-import java.nio.file.Files
-import java.security.{DigestInputStream, MessageDigest}
+import com.typesafe.scalalogging.LazyLogging
+
+import in.handyman.command.CommandProxy
+import in.handyman.config.ConfigurationService
+import in.handyman.util.ParameterisationEngine
 
 
+/**
+ * TODO - Still need to add more rich ness to audit trail with respect to statement warnings
+ */
 class ChecksumAction extends in.handyman.command.Action with LazyLogging {
-  val detailMap = new java.util.HashMap[String, String]
-  val auditMarker = "CheckSum";
-  val aMarker = MarkerFactory.getMarker(auditMarker);
 
-  def execute(context: Context, action: in.handyman.dsl.Action, actionId: Integer): Context = {
-    val checkSumAsIs: in.handyman.dsl.Checksum = action.asInstanceOf[in.handyman.dsl.Checksum]
-    val checksum: in.handyman.dsl.Checksum = CommandProxy.createProxy(checkSumAsIs, classOf[in.handyman.dsl.Checksum], context)
+  val detailMap = new java.util.HashMap[String, String]
+  val auditMarker = "CHECKSUM";
+  val aMarker = MarkerFactory.getMarker(auditMarker);
+  
+  def execute(context: in.handyman.command.Context, action: in.handyman.dsl.Action, actionId: Integer): in.handyman.command.Context = {
+
+    //Setting up the proxy for retrieving configuration for the macro
+    val checksumAsIs: in.handyman.dsl.Checksum = action.asInstanceOf[in.handyman.dsl.Checksum]
+    val checksum: in.handyman.dsl.Checksum = CommandProxy.createProxy(checksumAsIs, classOf[in.handyman.dsl.Checksum], context)
+
+    //Retrieving the global config map for default value
+    val configMap = ConfigurationService.getGlobalconfig()
+
+    val instanceId = context.getValue("process-id")
 
     val name = checksum.getName
-    val ddlSql: String = /*checksum.getValue.replaceAll("\"", "")*/"select filepath from 105_dropbox;"
-    val id = context.getValue("process-id")
-    val db = checksum.getDb
+    var localDir = checksum.getLocalDir
+    val localFile = checksum.getLocalFile
+    val remoteDir = checksum.getRemoteDir
+    val userName = checksum.getUsername
+    val password = checksum.getPassword
+    val host = checksum.getHost
+    val port : Int = Integer.valueOf(checksum.getPort)
+    val remoteFile = checksum.getRemoteFile
+    val remote = remoteDir.concat(remoteFile)
+    val local = localDir.concat(localFile)
     
-    val cstype = checksum.getCstype
-    var directory: File = null
-    var file = ""
-
-    val checksumDbConnfrom = ResourceAccess.rdbmsConn(db)
-    val checksumStmtfrom = checksumDbConnfrom.createStatement
-    checksumDbConnfrom.setAutoCommit(false)
-    val now = "now()"
-    
-    var fileCount = 0; //count of files for which checksum have been created
-    try {
-      var obj: ChecksumAction = new ChecksumAction
-      val rs = checksumStmtfrom.executeQuery(ddlSql)
-      //var ct=0
-      while (rs.next()) 
-      {
-        //ct +=1
-        file = rs.getString("filepath")
-        if (file.contains("\\")) 
-        {
-      			file = file.replace("\\", "\\\\")
-      	}
-        file = file.stripSuffix(".zip")
-        directory = new File(file)
+    detailMap.put("name", name)
+    detailMap.put("localDir", localDir)
+    detailMap.put("localFile", localFile)
+    detailMap.put("remoteDir", remoteDir)
+    detailMap.put("userName", userName)
+    detailMap.put("password", password)
+    detailMap.put("host", host)
+    detailMap.put("port", checksum.getPort)
+    detailMap.put("remoteFile", remoteFile)
+    try{
+      val md5Digest : MessageDigest = MessageDigest.getInstance("MD5"); // We can also use SHA-256 instead of MD5 algorithm
+      
+      val ftpAct : FTPAction = new FTPAction();
+      ftpAct.connect(host)
+      ftpAct.login(userName, password)
+      val remoteFileChecksum : String = ftpAct.findChecksum(md5Digest, remote)
+      
+      val localFile : File = new File(local);
+      val localFileChecksum : String = findChecksum(md5Digest, localFile)
+      
+      var isEqual : String = "";
+      if(localFileChecksum == remoteFileChecksum)
+        isEqual = "true"
+      else 
+        isEqual = "false"
         
-        /*if(ct>1)
-        {*/
-          var generatedChecksum = obj.md5(directory)
-          println(generatedChecksum)                 
-       		fileCount +=1
-         		
-       		val query = "update " + id + "_dropbox" + " set checksum ='" + generatedChecksum  + "' where filepath ='" +file +"';"
-          
-          checksumStmtfrom.execute(query)
-          checksumDbConnfrom.commit()
-          logger.info("Updated the checksum for the file "+directory.getName +"in the table "+id+"_dropbox")
-       // }
-        
-          
-
-        
-        
-      }
-    } 
-    catch {
-      case ex: Exception => {
-        ex.printStackTrace()
-      }
-    }
-     finally {
-      detailMap.put("name", name)
-      detailMap.put("db", db)
-      detailMap.put("ddlSql", ddlSql)
-      detailMap.put("Number of files for which checksum generated",fileCount.toString)
+      context.addValue(name + "." +"status", isEqual)
+      detailMap.put(name + "." + "status", isEqual)
+      
+      logger.info(aMarker, "Checksum id#{}, name#{}, remoteFile#{}, localFile=#{}, isEqual=#{}", 
+          instanceId, name, remoteFileChecksum, localFileChecksum, isEqual)          
+    }finally {
     }
     context
-
   }
   
-  def md5(roots: File*): String = 
-        {
-            val md = MessageDigest.getInstance("MD5")
-            roots.foreach { root =>
-              Files.walk(root.toPath).filter(!_.toFile.isDirectory).forEach { path =>
-                val dis = new DigestInputStream(Files.newInputStream(path), md)
-                // fully consume the inputstream
-                while (dis.available > 0) {
-                  dis.read
-                }
-                dis.close
-              }
-            }
-            md.digest.map(b => String.format("%02x", Byte.box(b))).mkString
-        }
+  def findChecksum(digest : MessageDigest, file : File) : String = {
+    //Get file input stream for reading the file content
+    val fis : FileInputStream = new FileInputStream(file);
+     
+    //Create byte array to read data in chunks
+    val byteArray : Array[Byte] = new Array[Byte](1024);
+    var bytesCount : Int = 0; 
+      
+    //Read file data and update in message digest
+    bytesCount = fis.read(byteArray);
+    while (bytesCount > 0) {
+      digest.update(byteArray, 0, bytesCount)
+      bytesCount = fis.read(byteArray);
+    }
+     
+    //close the stream; We don't need it now.
+    fis.close();
+     
+    //Get the hash's bytes
+    val bytes : Array[Byte] = digest.digest();
+     
+    //This bytes[] has bytes in decimal format;
+    //Convert it to hexadecimal format
+    var sb : StringBuilder = new StringBuilder();
+    bytes.foreach(byt => sb.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1)))
+     
+    //return complete hash
+    sb.toString();
+  }
 
-  def executeIf(context: Context, action: in.handyman.dsl.Action): Boolean = {
-    val checkSumAsIs: in.handyman.dsl.Checksum = action.asInstanceOf[in.handyman.dsl.Checksum]
-    val checksum: in.handyman.dsl.Checksum = CommandProxy.createProxy(checkSumAsIs, classOf[in.handyman.dsl.Checksum], context)
+  def executeIf(context: in.handyman.command.Context, action: in.handyman.dsl.Action): Boolean =
+    {
+      val checksumAsIs: in.handyman.dsl.Checksum = action.asInstanceOf[in.handyman.dsl.Checksum]
+      val checksum: in.handyman.dsl.Checksum = CommandProxy.createProxy(checksumAsIs, classOf[in.handyman.dsl.Checksum], context)
 
-    val expression = checksum.getCondition
-    try {
-      val output = ParameterisationEngine.doYieldtoTrue(expression)
-      detailMap.putIfAbsent("condition-output", output.toString())
-      output
-    } finally {
-      if (expression != null)
-        detailMap.putIfAbsent("condition", "LHS=" + expression.getLhs + ", Operator=" + expression.getOperator + ", RHS=" + expression.getRhs)
+      val expression = checksum.getCondition
+      try {
+        val output = ParameterisationEngine.doYieldtoTrue(expression)
+        detailMap.putIfAbsent("condition-output", output.toString())
+        output
+      } finally {
+        if (expression != null)
+          detailMap.putIfAbsent("condition", "LHS=" + expression.getLhs + ", Operator=" + expression.getOperator + ", RHS=" + expression.getRhs)
+      }
 
     }
-
-  }
 
   def generateAudit(): java.util.Map[String, String] = {
     detailMap

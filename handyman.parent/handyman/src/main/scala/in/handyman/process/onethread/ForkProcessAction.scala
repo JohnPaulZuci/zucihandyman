@@ -55,8 +55,9 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
 
     var contextSet: java.util.Set[TryContext] = new java.util.HashSet[TryContext]
     while (rs.next()) {
-      val tryContext = new TryContext(context.getMeAsIs(), processName)
-      
+      val tryContext = new TryContext(new scala.collection.immutable.HashMap[String, String](), processName)
+      tryContext.addValue("basepath", context.getValue("basepath"))
+
       for (i <- 1 until columnCount + 1) {
         val key = rs.getMetaData.getColumnLabel(i)
         val value = rs.getString(i)
@@ -78,11 +79,12 @@ class ForkProcessAction extends in.handyman.command.Action with LazyLogging {
       }
     }
     
-    if(!contextSet.isEmpty() && !forkBatchMap.isEmpty()){
-        val batchNo : Int = (threadCount.intValue() / forkBatchSizeInt) + 1
-        forkBatchMap.put(batchNo, contextSet)
-    }else if(!contextSet.isEmpty() && forkBatchMap.isEmpty()){
-        forkBatchMap.put(1, contextSet)
+
+    if (!contextSet.isEmpty() && !forkBatchMap.isEmpty()) {
+      val batchNo : Int = (threadCount.intValue() / forkBatchSizeInt) + 1
+      forkBatchMap.put(batchNo, contextSet)
+    }else{
+      forkBatchMap.put(1, contextSet)
     }
     
     try {} finally {
