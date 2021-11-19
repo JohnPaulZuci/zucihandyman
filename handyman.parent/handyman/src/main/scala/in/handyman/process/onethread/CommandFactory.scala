@@ -19,7 +19,16 @@ object CommandFactory {
       case "deletefolder" => new DeleteFolderAction
       case "copydata" => new CopydataAction
       case "terminal" => new TerminalAction
-      case "writecsv" => new WriteCsvAction
+      
+      case "mail" => new EMailAction
+      case "targeneration" => new TarGenerationAction
+      case "modelgeneration" => new ModelGenerationAction
+      case "mahout" => new ModelTrainingAction
+      case "terminal" => new TerminalAction
+      case "writecsv" => new WriteCsvAndTsvAction
+      case "nlptextpreprocessing" => new NLPTextPreprocessingAction
+      case "dropboxcleanup" => new DropboxCleanupAction
+      //////case "writecsv" => new WriteCsvAction
       case "mongo2db" => new Mongo2DbAction
       case "ftp" => new FTPAction
       case "zip" => new ZipAction
@@ -34,8 +43,7 @@ object CommandFactory {
       case "updatesql" => new UpdateSqlAction
       case "dropsql" => new DropSqlAction
       case "deletesql" => new DeleteSqlAction
-      case "truncatesql" => new TruncateSqlAction
-      
+      case "truncatesql" => new TruncateSqlAction      
     }
   }
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Method
 import java.sql.SQLException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.ArrayList
 import java.util.Date
 import java.util.HashMap
 import java.util.HashSet
@@ -127,7 +128,6 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
               insert = "insert into " + table + " (" + insertFields + ")" + " values " + query.substring(0, query.length() - 1) + ";"
             }
             logger.info("Mongodbsql (Nqne) id#{}, name#{}, from#{}, rows#{}", id, name, source, rowsProcessed.toString)
-
             mongo2DbStmtto.execute(insert)
 
             mongo2DbDbConnto.commit()
@@ -284,8 +284,21 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       } else if ((colVal.isInstanceOf[java.util.ArrayList[_]])) {
         val colValObj = colVal.asInstanceOf[java.util.ArrayList[_]]
         if (colValObj != null && !colValObj.isEmpty()) {
-          colValStr = colValObj.get(0).toString()
-          queryAppend = queryAppend + "\'" + colValStr + "\'" + ","
+          /*val gson : Gson = new GsonBuilder().create();
+          val myCustomArray : JsonArray = gson.toJsonTree(colValObj).getAsJsonArray();
+          System.out.println("array element4....."+ myCustomArray.toString());
+          System.out.println("array element5....."+ gson.toJson(colValObj));
+          System.out.println("array element6....."+ gson.toJson(colValObj, new TypeToken[ArrayList[_]]() {}.getType()))*/
+
+          val jsonArray : JSONArray = new JSONArray(colValObj);
+          /*logger.info("array element1....."+jsonArray.toString());
+          System.out.println("array element2....."+(new JSONArray(colValObj.toArray())).toString());
+          System.out.println("array element3....."+(new JSONArray(colValObj.toArray())).toString());*/
+          /*colValStr = ""
+          colValObj.forEach(colValO => colValStr = colValStr + colValO.toString() + "|")
+          queryAppend = queryAppend + "\'" + colValStr.substring(0, colValStr.length()-1) + "\'" + ","*/
+          queryAppend = queryAppend + "\'" + jsonArray.toString() + "\'" + ","
+
         } else {
           queryAppend = queryAppend + null + ","
         }
@@ -380,7 +393,8 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
     
     val jsonArr: JSONArray = new JSONArray(filter);
     var col: String = "";
-    var obj: ArrayList[BasicDBObject] = new ArrayList[BasicDBObject]();
+    var andobj: ArrayList[BasicDBObject] = new ArrayList[BasicDBObject]();
+    var orobj: ArrayList[BasicDBObject] = new ArrayList[BasicDBObject]();
     for (i <- 0 to jsonArr.length() - 1) {
       var filObj: BasicDBObject = null;
       val jsonObj: JSONObject = jsonArr.get(i).asInstanceOf[JSONObject];
@@ -388,38 +402,53 @@ class Mongo2DbAction extends in.handyman.command.Action with LazyLogging {
       col = String.valueOf(jsonObj.get("column"))
       val colType: String = String.valueOf(jsonObj.get("type"))
       val colFormat: String = String.valueOf(jsonObj.get("format"))
+      val logicalOperator: String = String.valueOf(jsonObj.get("logical-operator"))
+
 
       val condArr: JSONArray = new JSONArray(String.valueOf(jsonObj.get("condition")));
       for (j <- 0 to condArr.length() - 1) {
         val condObj: JSONObject = condArr.get(j).asInstanceOf[JSONObject];
         val operator: String = String.valueOf(condObj.get("operator"))
-        var colVal: String = String.valueOf(condObj.get("value"))
+        var colVal: Object = condObj.get("value")
         
-        if (colVal != null && !colVal.isEmpty()) {
-          var colFormatted: Date = null;
-          if (colType.equals("date") && !colFormat.isEmpty()) {
-            colFormatted = new SimpleDateFormat(colFormat).parse(colVal);
-  
-            if (filObj == null) {
-              filObj = new BasicDBObject(operator, colFormatted);
-            } else {
-              filObj = filObj.append(operator, colFormatted);
-            }
+        var colFormatted: Date = null;
+        if (colType.equals("date") && !colFormat.isEmpty() && colVal != null) {
+          colFormatted = new SimpleDateFormat(colFormat).parse(String.valueOf(colVal));
+
+          if (filObj == null) {
+            filObj = new BasicDBObject(operator, colFormatted);
           } else {
-              if (filObj == null) {
-                filObj = new BasicDBObject(operator, colVal);
-              } else {
-                filObj = filObj.append(operator, colVal);
-              }
+            filObj = filObj.append(operator, colFormatted);
           }
+        } else {
+          if(colVal.equals(null)){
+            if (filObj == null) {
+              filObj = new BasicDBObject(operator, null);
+            } else {
+              filObj = filObj.append(operator, null);
+            }
+          }else{
+            if (filObj == null) {
+              filObj = new BasicDBObject(operator, String.valueOf(colVal));
+            } else {
+              filObj = filObj.append(operator, String.valueOf(colVal));
+            }
+        }
         }
       }
-      obj.add(new BasicDBObject(col, filObj));
+      if(logicalOperator.equalsIgnoreCase("and"))
+        andobj.add(new BasicDBObject(col, filObj));
+      else if(logicalOperator.equalsIgnoreCase("or"))
+        orobj.add(new BasicDBObject(col, filObj));
     }
 
-    if (!obj.isEmpty()) {
+    if (!andobj.isEmpty()) {
       var andQuery: BasicDBObject = new BasicDBObject();
-      andQuery.put("$and", obj);
+      andQuery.put("$and", andobj);
+      
+      if (!orobj.isEmpty()) {
+        andobj.add(new BasicDBObject("$or", orobj))
+      }
 
       val findIterate: FindIterable[Document] = coll.find(andQuery).batchSize(fetchSize.toInt).projection(projectFields)
 

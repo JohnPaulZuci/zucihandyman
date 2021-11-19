@@ -59,9 +59,10 @@ class TransformAction extends in.handyman.command.Action with LazyLogging {
               }
               
               case ex: SQLException => {
-                logger.error(aMarker, "Continuing to execute, even though SQL Error executing sql for {} ", sql, ex)
+                //logger.error(aMarker, "Continuing to execute, even though SQL Error executing sql for {} ", sql, ex)
+                logger.error(aMarker, "Stopping execution, General Error iexecuting sql for {} with for campaign {}", sql, ex)
                 detailMap.put(sql.trim + ".exception", ExceptionUtil.completeStackTraceex(ex))
-                
+                throw ex
               }
               
               case ex: Throwable => {

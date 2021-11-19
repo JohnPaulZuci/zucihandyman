@@ -1,26 +1,27 @@
 package in.handyman.process.onethread
 
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Callable
+import com.typesafe.scalalogging.LazyLogging
+import net.sf.jsqlparser.statement.insert.Insert
+import in.handyman.util.ResourceAccess
+import in.handyman.HandymanException
+import scala.util.control.Breaks
 import java.sql.SQLException
 import java.sql.Statement
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.Callable
-import java.util.concurrent.CountDownLatch
-
-import scala.util.control.Breaks
-
-import com.typesafe.scalalogging.LazyLogging
-
-import in.handyman.HandymanException
-import in.handyman.util.ResourceAccess
-import net.sf.jsqlparser.statement.insert.Insert
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.ArrayList
+
 
 class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonPill: Row,
                          copyData: in.handyman.dsl.Copydata,
                          id:       String, rowQueue: BlockingQueue[Row],
                          countDownLatch: CountDownLatch) extends Callable[Void] with LazyLogging {
 
+
   val writeBuffer: ArrayList[String] = new ArrayList[String]
+
   val target = {
     if (!copyData.getTo.trim.isEmpty())
       copyData.getTo.trim
@@ -34,6 +35,7 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
     c
   }
 
+
 //  val writeSize = {
 //    if (!copyData.getWriteBatchSize.isEmpty && copyData.getWriteBatchSize.toInt > 0)
 //      copyData.getWriteBatchSize.toInt
@@ -41,6 +43,7 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
 //      configMap.getOrElse(Constants.WRITESIZE, Constants.DEFAULT_WRITE_SIZE).toInt
 //    }
 //  }
+
 
   val columnList = {
     val colListBuilder = new StringBuilder
@@ -54,7 +57,7 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
     })
     colListBuilder.toString
   }
-  
+
   def call(): Void = {
 
     Breaks.breakable {
@@ -72,6 +75,7 @@ class CopyDataJdbcWriter(configMap: Map[String, String], insert: Insert, poisonP
         } else {
           val dataFrame = generateDataFrame(row)
           writeBuffer.add(dataFrame)
+
 //          if (writeBuffer.size % writeSize == 0) {
 //            val wriBuffSize = writeBuffer.size.toString()
 //            logger.info(s"CopydataWriter(Before poison pill) flushing to database rows:$wriBuffSize")
